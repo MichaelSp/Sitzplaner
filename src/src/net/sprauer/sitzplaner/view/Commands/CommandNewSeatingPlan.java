@@ -2,29 +2,33 @@ package net.sprauer.sitzplaner.view.Commands;
 
 import java.awt.event.ActionEvent;
 
-import net.sprauer.sitzplaner.EA.ClassRoomToSmallException;
 import net.sprauer.sitzplaner.EA.EAFactory;
-import net.sprauer.sitzplaner.EA.GeneString;
-import net.sprauer.sitzplaner.view.ClassRoom;
+import net.sprauer.sitzplaner.exceptions.ClassNotLoadedException;
+import net.sprauer.sitzplaner.exceptions.ClassRoomToSmallException;
 
 public class CommandNewSeatingPlan extends AbstractCommand {
 	private static final long serialVersionUID = -2671082852870438865L;
 
-	CommandNewSeatingPlan(ClassRoom classView, GeneString classModel) {
-		super(classView, classModel);
-		putValue(NAME, "Neue Sitzordnung");
-		putValue(SHORT_DESCRIPTION, "Neu berechnen");
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		try {
+			EAFactory.greedy(getModel());
+			EAFactory.optimize(getModel());
+			getView().setModel(getModel());
+		} catch (ClassRoomToSmallException e1) {
+			warningBox(e1.getMessage(), "Sitzplaner - Klasse");
+		} catch (ClassNotLoadedException e1) {
+
+		}
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		GeneString gen;
-		try {
-			EAFactory.greedy(classModel);
-			EAFactory.optimize(classModel);
-			classView.setModel(classModel);
-		} catch (ClassRoomToSmallException e1) {
-			warningBox("The class room is to small for all students.", "MainWindow");
-		}
+	public String getButtonCaption() {
+		return "Neu berechnen";
+	}
+
+	@Override
+	public String getToolTip() {
+		return "Neue Sitzordnung aus den gegebenen Parametern berechnen";
 	}
 }

@@ -9,9 +9,10 @@ import java.awt.Polygon;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.sprauer.sitzplaner.model.ModelData;
+import net.sprauer.sitzplaner.EA.GeneString;
 import net.sprauer.sitzplaner.model.Student;
 
 public class ClassRoom extends JPanel {
@@ -23,6 +24,7 @@ public class ClassRoom extends JPanel {
 	private int selectionRelationValue;
 	ClassRoomEventListener eventListener;
 	final Legende legende;
+	private final JLabel lblFitness;
 
 	public ClassRoom() {
 		Dimension size = new Dimension(760, 340);
@@ -39,6 +41,11 @@ public class ClassRoom extends JPanel {
 		blackboard.init(size);
 		legende = new Legende(size);
 		add(legende);
+
+		lblFitness = new JLabel("0.0");
+		lblFitness.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		lblFitness.setBounds(0, 10, getWidth(), 20);
+		add(lblFitness);
 		legende.init(new Dimension(60, size.height - Parameter.blackboardHeight * 2));
 	}
 
@@ -69,31 +76,38 @@ public class ClassRoom extends JPanel {
 		}
 	}
 
-	public void setModel(ModelData classModel) {
+	public void setModel(GeneString classModel) {
 		clear();
 
 		for (Student student : classModel.getStudents()) {
 			Table table = new Table(student, this);
+			if (student.position == null) {
+				continue;
+			}
 			tables.add(table);
 			add(table);
 			table.setLocation(Table.coordsToPoint(student.position));
 		}
+		lblFitness.setText("" + classModel.getFitness());
 		validate();
 		setFocusable(true);
 		requestFocusInWindow();
 	}
 
-	void clear() {
+	public void clear() {
 		for (TableBase table : tables) {
 			remove(table);
 		}
 		tables.clear();
+		validate();
+		repaint();
 	}
 
 	public void hideRelations() {
 		for (TableBase table : tables) {
 			table.setBackground(Table.DEFAULT_BACKGROUND_COLOR);
 		}
+		setRelationLine(null, null, -1);
 	}
 
 	public void showRelationsFor(Student student) {
@@ -103,6 +117,10 @@ public class ClassRoom extends JPanel {
 			}
 			table.setColorForRelationTo(student);
 		}
+		Point bbPos = new Point(blackboard.getLocationOnScreen());
+		Point tablePos = Table.coordsToPoint(student.position);
+		tablePos.translate(getLocationOnScreen().x, getLocationOnScreen().y);
+		setRelationLine(tablePos, bbPos, (int) (student.getFirstRowFactor() * 10));
 	}
 
 	public void setRelationLine(Point source, Point target, int relationValue) {

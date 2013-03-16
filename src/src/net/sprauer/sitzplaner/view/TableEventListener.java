@@ -99,7 +99,7 @@ class TableEventListener extends MouseAdapter {
 			if (e.getLocationOnScreen().y > blackboardPos.y) {
 				state = State.BlackboardSelected;
 				table.classRoom.setRelationLine(table.getLocationOnScreen(), blackboardPos,
-						(int) table.student.getFirstRowFactor(-1));
+						(int) table.student.getFirstRowFactor());
 				table.classRoom.blackboard.highlight(true);
 			} else {
 				state = State.SourceSelected;

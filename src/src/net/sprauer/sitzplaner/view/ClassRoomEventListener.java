@@ -45,7 +45,7 @@ public class ClassRoomEventListener extends ComponentAdapter implements MouseWhe
 			relation = Math.max(0, Math.min(relation, 10));
 			setRelationTo(relation);
 		} else if (TableEventListener.state == TableEventListener.State.EditPriority) {
-			int prio = (int) (TableEventListener.source.student.getFirstRowFactor(-1) * 10);
+			int prio = (int) (TableEventListener.source.student.getFirstRowFactor() * 10);
 			prio -= e.getWheelRotation();
 			prio = Math.max(0, Math.min(prio, 10));
 			setPrioTo(prio);

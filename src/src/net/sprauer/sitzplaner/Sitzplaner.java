@@ -3,9 +3,8 @@ package net.sprauer.sitzplaner;
 import javax.swing.SwingUtilities;
 
 import net.sprauer.sitzplaner.EA.GeneString;
-import net.sprauer.sitzplaner.model.Student;
 import net.sprauer.sitzplaner.view.ClassRoom;
-import net.sprauer.sitzplaner.view.Commands.CommandFactory;
+import net.sprauer.sitzplaner.view.Commands.Factory;
 
 public class Sitzplaner {
 
@@ -13,24 +12,23 @@ public class Sitzplaner {
 	private final ClassRoom classView;
 	private final MainWin mainWin;
 
-	public Sitzplaner() {
+	public Sitzplaner(String defaultFile) {
 
 		mainWin = new MainWin();
 		classView = new ClassRoom();
 		classModel = new GeneString();
-		for (int i = 0; i < 21; i++) {
-			classModel.addStudent(new Student((char) (i + 'A') + "", "" + (char) (i + 'A')));
-		}
-		CommandFactory.init(classModel, classView);
+		Factory.init(classModel, classView);
+
+		Factory.CommandLoadClass.loadFrom(defaultFile);
 
 		mainWin.initView(classView);
 	}
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				new Sitzplaner();
+				new Sitzplaner((args.length >= 1) ? args[0] : "DEFAULT.cls");
 			}
 		});
 	}

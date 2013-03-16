@@ -17,6 +17,7 @@ public class Student implements Serializable {
 	private final Map<Student, Double> relations = new HashMap<Student, Double>();
 
 	public Student() {
+		firstRowFactor = 1.0;
 	}
 
 	public Student(String fName, String lName) {
@@ -31,6 +32,10 @@ public class Student implements Serializable {
 
 	public void setFirstRowFactor(double priority) {
 		this.firstRowFactor = priority;
+	}
+
+	public double getFirstRowFactor() {
+		return firstRowFactor;
 	}
 
 	public double getFirstRowFactor(int positionY) {

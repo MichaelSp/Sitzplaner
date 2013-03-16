@@ -37,6 +37,9 @@ public class ModelData implements Serializable {
 		for (Student stud : students) {
 			stud.position = null;
 		}
+	}
 
+	public void clear() {
+		students = new ArrayList<Student>();
 	}
 }

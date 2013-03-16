@@ -6,15 +6,10 @@ import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 
 import net.sprauer.sitzplaner.EA.GeneString;
-import net.sprauer.sitzplaner.view.ClassRoom;
 
 public class CommandLoadClass extends AbstractCommand {
 
-	public CommandLoadClass(ClassRoom classView, GeneString classModel) {
-		super(classView, classModel);
-		putValue(NAME, "Laden");
-		putValue(SHORT_DESCRIPTION, "Eine Klasse laden");
-	}
+	private static final long serialVersionUID = 4563613037604731931L;
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -24,15 +19,25 @@ public class CommandLoadClass extends AbstractCommand {
 		}
 	}
 
-	void loadFrom(String selectedFile) {
+	public void loadFrom(String selectedFile) {
 		try {
 			final FileInputStream fo = new FileInputStream(selectedFile);
-			final ObjectInputStream oos = new ObjectInputStream(fo);
-			classModel = (GeneString) oos.readObject();
-			CommandFactory.CommandNewSeatingPlan.invoke();
+			final ObjectInputStream ois = new ObjectInputStream(fo);
+			Factory.classModel = (GeneString) ois.readObject();
+			ois.close();
+			Factory.CommandNewSeatingPlan.invoke();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 	}
 
+	@Override
+	public String getButtonCaption() {
+		return "Laden";
+	}
+
+	@Override
+	public String getToolTip() {
+		return "Eine Klasse aus einer .cls-Datei laden";
+	}
 }

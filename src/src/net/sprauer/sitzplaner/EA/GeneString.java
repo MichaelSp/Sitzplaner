@@ -9,7 +9,7 @@ import net.sprauer.sitzplaner.view.Parameter;
 public class GeneString extends ModelData {
 
 	private static final long serialVersionUID = -3578751251384286705L;
-	private double fitness = -1;
+	private final double fitness = -1;
 
 	public void addStudent(Student student, Point atPosition) {
 		student.position = atPosition;
@@ -32,25 +32,37 @@ public class GeneString extends ModelData {
 		}
 	}
 
-	private Point above(Student student) {
+	public Point above(Student student) {
+		if (student == null) {
+			return null;
+		}
 		Point p = (Point) student.position.clone();
 		p.y -= 1;
 		return p;
 	}
 
-	private Point below(Student student) {
+	public Point below(Student student) {
+		if (student == null) {
+			return null;
+		}
 		Point p = (Point) student.position.clone();
 		p.y += 1;
 		return p;
 	}
 
-	private Point rightOf(Student student) {
+	public Point rightOf(Student student) {
+		if (student == null) {
+			return null;
+		}
 		Point p = (Point) student.position.clone();
 		p.x += 1;
 		return p;
 	}
 
-	private Point leftOf(Student student) {
+	public Point leftOf(Student student) {
+		if (student == null) {
+			return null;
+		}
 		Point p = (Point) student.position.clone();
 		p.x -= 1;
 		return p;
@@ -69,7 +81,7 @@ public class GeneString extends ModelData {
 		return true;
 	}
 
-	private Student studentAtPosition(Point pos) {
+	public Student studentAtPosition(Point pos) {
 		for (Student student : students) {
 			if (student.position != null && student.position.equals(pos)) {
 				return student;
@@ -82,14 +94,4 @@ public class GeneString extends ModelData {
 		return fitness;
 	}
 
-	public void calcFitness() {
-		if (getFitness() != -1) {
-			return;
-		}
-		fitness = 0;
-		for (Student student : students) {
-			fitness += student.getFirstRowFactor(student.position.y);
-		}
-		System.out.println("fitness: " + fitness);
-	}
 }

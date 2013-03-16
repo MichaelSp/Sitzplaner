@@ -16,12 +16,14 @@ import net.sprauer.sitzplaner.view.ClassRoom;
 public abstract class AbstractCommand extends AbstractAction {
 
 	private static final long serialVersionUID = 8867316848013850813L;
-	protected final ClassRoom classView;
-	protected GeneString classModel;
 
-	public AbstractCommand(ClassRoom classView, GeneString classModel) {
-		this.classView = classView;
-		this.classModel = classModel;
+	public abstract String getButtonCaption();
+
+	public abstract String getToolTip();
+
+	public AbstractCommand() {
+		putValue(NAME, getButtonCaption());
+		putValue(SHORT_DESCRIPTION, getToolTip());
 	}
 
 	public void warningBox(String infoMessage, String location) {
@@ -29,11 +31,19 @@ public abstract class AbstractCommand extends AbstractAction {
 	}
 
 	protected MainWin getMainWin() {
-		Component parent = classView.getParent();
+		Component parent = getView().getParent();
 		while (!(parent instanceof MainWin) && parent != null) {
 			parent = parent.getParent();
 		}
 		return (MainWin) parent;
+	}
+
+	protected ClassRoom getView() {
+		return Factory.classView;
+	}
+
+	protected GeneString getModel() {
+		return Factory.classModel;
 	}
 
 	protected String getFile(int mode) {
