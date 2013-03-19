@@ -29,12 +29,10 @@ public class OperationGreedy implements EAOperation {
 		do {
 			Point nextFreePosition = gene.freePositionNextTo(studentB4);
 			Student firstStudent = getStudentWithLowestPriority();
-			Student secondStudent = findBestMatchTo(studentB4);
-			Student choice = selectBetterChoice(firstStudent, secondStudent, nextFreePosition, studentB4);
 
-			removeFromListOfStudents(choice);
-			choice.position = nextFreePosition;
-			studentB4 = choice;
+			removeFromListOfStudents(firstStudent);
+			firstStudent.position = nextFreePosition;
+			studentB4 = firstStudent;
 			System.out.println(listOfStudents);
 		} while (!listOfStudents.isEmpty());
 		gene = model;
