@@ -35,7 +35,8 @@ public class Dialogs {
 	}
 
 	private static JSpinner createSpinner() {
-		SpinnerNumberModel sModel = new SpinnerNumberModel(20, 1, Parameter.numCols * Parameter.numRows, 1);
+		int num = Math.min(Parameter.numCols * Parameter.numRows, 20);
+		SpinnerNumberModel sModel = new SpinnerNumberModel(num, 1, Parameter.numCols * Parameter.numRows, 1);
 		JSpinner spinner = new JSpinner(sModel);
 		return spinner;
 	}

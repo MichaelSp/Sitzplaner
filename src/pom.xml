@@ -16,4 +16,12 @@
       </plugin>
     </plugins>
   </build>
+
+  <dependencies>
+  	<dependency>
+  		<groupId>net.sf.jgap</groupId>
+  		<artifactId>jgap</artifactId>
+  		<version>3.4.4</version>
+  	</dependency>
+  </dependencies>
 </project>

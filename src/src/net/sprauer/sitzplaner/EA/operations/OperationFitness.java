@@ -14,7 +14,6 @@ public class OperationFitness implements EAOperation {
 	@Override
 	public void invoke(GeneString gene) throws Exception {
 		double fitness = 0;
-
 		for (int x = 0; x < Parameter.numCols; x++) {
 			for (int y = 0; y < Parameter.numRows; y++) {
 				Student student = gene.studentAtPosition(new Point(x, y));

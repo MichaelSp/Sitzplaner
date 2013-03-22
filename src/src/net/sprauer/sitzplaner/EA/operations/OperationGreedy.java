@@ -42,25 +42,6 @@ public class OperationGreedy implements EAOperation {
 		listOfStudents.remove(model.getStudents().indexOf(choice));
 	}
 
-	private Student selectBetterChoice(Student firstStudent, Student secondStudent, Point position, Student lastStudent) {
-		if (firstStudent == null) {
-			return secondStudent;
-		}
-		if (secondStudent == null) {
-			return firstStudent;
-		}
-		if (position == null) {
-			System.out.println("ffuuuuu pos");
-		}
-		double firstStudentFitness = firstStudent.getFirstRowFactor(position.y);
-		double secondStudentFitness = secondStudent.relationTo(lastStudent);
-		if (firstStudentFitness < secondStudentFitness) {
-			return firstStudent;
-		} else {
-			return secondStudent;
-		}
-	}
-
 	private void checkClassRoomSize() throws ClassRoomToSmallException, ClassNotLoadedException {
 		if (model.size() > (Parameter.numRows * Parameter.numCols)) {
 			throw new ClassRoomToSmallException("Der Raum ist zu klein für diese Klasse");
@@ -86,27 +67,6 @@ public class OperationGreedy implements EAOperation {
 
 	private Student getStudentWithLowestPriority() {
 		return model.get(listOfStudents.size() - 1);
-	}
-
-	private Student findBestMatchTo(Student student) {
-		if (student == null) {
-			return null;
-		}
-		double bestRelation = 1;
-		Student bestStud = null;
-		List<Student> students = model.getStudents();
-		for (int i = 0; i < students.size(); i++) {
-			if (!listOfStudents.contains(i)) {
-				continue;
-			}
-			Student stud = students.get(i);
-			Double currentRelation = stud.relationTo(student);
-			if (currentRelation < bestRelation) {
-				bestStud = stud;
-				bestRelation = currentRelation;
-			}
-		}
-		return bestStud;
 	}
 
 }
