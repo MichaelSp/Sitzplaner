@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 
-import javax.annotation.PostConstruct;
-
 import net.sprauer.sitzplaner.model.DataBase;
 
 public class Chromosome implements Iterable<Point>, Comparable<Chromosome>, Serializable {
