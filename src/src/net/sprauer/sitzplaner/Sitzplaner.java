@@ -1,27 +1,32 @@
 package net.sprauer.sitzplaner;
 
+import java.io.File;
+
 import javax.swing.SwingUtilities;
 
-import net.sprauer.sitzplaner.EA.GeneString;
-import net.sprauer.sitzplaner.view.ClassRoom;
+import net.sprauer.sitzplaner.view.MainWin;
 import net.sprauer.sitzplaner.view.Commands.Factory;
 
 public class Sitzplaner {
 
-	private final GeneString classModel;
-	private final ClassRoom classView;
 	private final MainWin mainWin;
 
 	public Sitzplaner(String defaultFile) {
 
 		mainWin = new MainWin();
-		classView = new ClassRoom();
-		classModel = new GeneString();
-		Factory.init(classModel, classView);
+		Factory.init();
+		mainWin.initView();
 
-		Factory.CommandLoadClass.loadFrom(defaultFile);
+		if (fileExists(defaultFile)) {
+			Factory.CommandLoadClass.loadFrom(defaultFile);
+		} else {
+			System.err.println("Unable to load: " + defaultFile);
+		}
+	}
 
-		mainWin.initView(classView);
+	private boolean fileExists(String defaultFile) {
+		File f = new File(defaultFile);
+		return f.exists() && f.isFile();
 	}
 
 	public static void main(final String[] args) {

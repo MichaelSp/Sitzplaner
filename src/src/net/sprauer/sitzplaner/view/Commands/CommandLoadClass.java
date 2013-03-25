@@ -1,11 +1,16 @@
 package net.sprauer.sitzplaner.view.Commands;
 
+import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 
-import net.sprauer.sitzplaner.EA.GeneString;
+import javax.swing.SwingUtilities;
+
+import net.sprauer.sitzplaner.model.DataBase;
+import net.sprauer.sitzplaner.view.ClassRoom;
+import net.sprauer.sitzplaner.view.panels.ToolsPanel;
 
 public class CommandLoadClass extends AbstractCommand {
 
@@ -21,11 +26,20 @@ public class CommandLoadClass extends AbstractCommand {
 
 	public void loadFrom(String selectedFile) {
 		try {
+			resetToNewClassSize(0);
 			final FileInputStream fo = new FileInputStream(selectedFile);
 			final ObjectInputStream ois = new ObjectInputStream(fo);
-			Factory.classModel = (GeneString) ois.readObject();
+			Dimension dim = (Dimension) ois.readObject();
+			ClassRoom.instance().setNewDimensions(dim);
+			ToolsPanel.instance().setClassRoomDimensions(dim);
+			DataBase.restoreFrom(ois);
 			ois.close();
-			Factory.CommandNewSeatingPlan.invoke();
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					Factory.CommandNewSeatingPlan.invoke();
+				}
+			});
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

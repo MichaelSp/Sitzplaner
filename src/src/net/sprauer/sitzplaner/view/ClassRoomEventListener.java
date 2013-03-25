@@ -9,7 +9,9 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
+import net.sprauer.sitzplaner.model.DataBase;
 import net.sprauer.sitzplaner.view.TableEventListener.State;
+import net.sprauer.sitzplaner.view.helper.Parameter;
 
 public class ClassRoomEventListener extends ComponentAdapter implements MouseWheelListener, KeyListener, MouseListener {
 
@@ -21,31 +23,23 @@ public class ClassRoomEventListener extends ComponentAdapter implements MouseWhe
 
 	@Override
 	public void componentResized(ComponentEvent e) {
-		Parameter.numCols = classRoom.getWidth() / (Parameter.tableWidth + Parameter.spacing * 2);
-		Parameter.numRows = (classRoom.getHeight() - Parameter.blackboardHeight)
-				/ (Parameter.tableHeight + Parameter.spacing * 2);
-
-		Parameter.widthFactor = Parameter.tableWidth + Parameter.spacing / 2;
-		Parameter.heightFactor = Parameter.tableHeight + Parameter.spacing / 2;
-		Parameter.maxWidth = (Parameter.numCols) * Parameter.widthFactor;
-		Parameter.maxHeight = (Parameter.numRows) * Parameter.heightFactor;
 		Parameter.offsetX = (classRoom.getWidth() - Parameter.maxWidth) / 2 + Parameter.legendWidth / 2;
 		Parameter.offsetY = (classRoom.getHeight() - Parameter.maxHeight) / 2;
-		classRoom.clear();
 		classRoom.blackboard.init(classRoom.getSize());
 		classRoom.legende.init(classRoom.getSize());
 		classRoom.validate();
+		classRoom.updateTablePositions();
 	}
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		if (TableEventListener.state == TableEventListener.State.EditRelationToStudent) {
-			int relation = (int) (TableEventListener.source.student.relationTo(TableEventListener.target.student) * 10);
+			int relation = DataBase.relationBetween(TableEventListener.source.student(), TableEventListener.target.student());
 			relation -= e.getWheelRotation();
-			relation = Math.max(0, Math.min(relation, 10));
+			relation = Math.max(-5, Math.min(relation, 5));
 			setRelationTo(relation);
 		} else if (TableEventListener.state == TableEventListener.State.EditPriority) {
-			int prio = (int) (TableEventListener.source.student.getFirstRowFactor() * 10);
+			int prio = DataBase.getPriority(TableEventListener.source.student());
 			prio -= e.getWheelRotation();
 			prio = Math.max(0, Math.min(prio, 10));
 			setPrioTo(prio);
@@ -53,13 +47,13 @@ public class ClassRoomEventListener extends ComponentAdapter implements MouseWhe
 	}
 
 	private void setRelationTo(int relation) {
-		TableEventListener.setRelationTo(relation / 10.0);
+		TableEventListener.setRelationTo(relation);
 		classRoom.setRelationLine(TableEventListener.source.getLocationOnScreen(),
 				TableEventListener.target.getLocationOnScreen(), relation);
 	}
 
 	private void setPrioTo(int prio) {
-		TableEventListener.source.student.setFirstRowFactor(prio / 10.0);
+		DataBase.setPriority(TableEventListener.source.student(), prio);
 		TableEventListener.source.classRoom.setRelationLine(TableEventListener.source.getLocationOnScreen(),
 				TableEventListener.blackboardCenter(), prio);
 	}

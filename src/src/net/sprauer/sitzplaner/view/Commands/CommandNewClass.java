@@ -2,7 +2,6 @@ package net.sprauer.sitzplaner.view.Commands;
 
 import java.awt.event.ActionEvent;
 
-import net.sprauer.sitzplaner.model.Student;
 import net.sprauer.sitzplaner.view.Dialogs.Dialogs;
 
 public class CommandNewClass extends AbstractCommand {
@@ -12,15 +11,11 @@ public class CommandNewClass extends AbstractCommand {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
-		int size = Dialogs.getClassSize();
-		if (size < 0) {
+		int classSize = Dialogs.getClassSize();
+		if (classSize < 0) {
 			return;
 		}
-		getView().clear();
-		getModel().clear();
-		for (int i = 0; i < size; i++) {
-			getModel().addStudent(new Student((char) (i + 'A') + "", "" + (char) (i + 'A')));
-		}
+		resetToNewClassSize(classSize);
 		Factory.CommandNewSeatingPlan.invoke();
 	}
 

@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import net.sprauer.sitzplaner.EA.EAFactory;
 import net.sprauer.sitzplaner.exceptions.ClassNotLoadedException;
 import net.sprauer.sitzplaner.exceptions.ClassRoomToSmallException;
+import net.sprauer.sitzplaner.model.Population;
+import net.sprauer.sitzplaner.view.ClassRoom;
 
 public class CommandNewSeatingPlan extends AbstractCommand {
 	private static final long serialVersionUID = -2671082852870438865L;
@@ -12,13 +14,15 @@ public class CommandNewSeatingPlan extends AbstractCommand {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		try {
-			EAFactory.greedy(getModel());
-			EAFactory.optimize(getModel());
-			getView().setModel(getModel());
+			EAFactory.greedy();
+			EAFactory.optimize();
+			ClassRoom.instance().showChromosome(Population.instance().getBestSolution());
 		} catch (ClassRoomToSmallException e1) {
-			warningBox(e1.getMessage(), "Sitzplaner - Klasse");
+			warningBox("Der Klassenraum ist zu klein.", "Sitzplaner - Klasse");
 		} catch (ClassNotLoadedException e1) {
 
+		} catch (Exception e1) {
+			e1.printStackTrace();
 		}
 	}
 

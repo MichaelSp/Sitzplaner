@@ -16,5 +16,8 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/jgap_3.6.2_full/work/maven/lib/jgap-3.6.2-javadoc.jar"/>
+	<classpathentry kind="lib" path="lib/jgap_3.6.2_full/work/maven/lib/jgap-3.6.2-sources.jar"/>
+	<classpathentry kind="lib" path="lib/jgap_3.6.2_full/work/maven/lib/jgap-3.6.2.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

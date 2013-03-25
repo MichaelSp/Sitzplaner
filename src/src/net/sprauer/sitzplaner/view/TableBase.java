@@ -13,26 +13,26 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import net.sprauer.sitzplaner.model.Student;
+import net.sprauer.sitzplaner.model.DataBase;
 import net.sprauer.sitzplaner.view.TableEventListener.State;
 
 public class TableBase extends JPanel {
 
 	private static final long serialVersionUID = 7454235700262659177L;
-	protected final Student student;
+	protected final int studentIdx;
 	protected final ClassRoom classRoom;
 	protected final JTextField nameInput = new JTextField();
 	protected final JLabel lblStudent;
 	protected final JLabel lblHelp = new JLabel("Vorname Nachname");
 
-	public TableBase(Student student, ClassRoom classRoom) {
-		this.student = student;
+	public TableBase(int studentIdx, ClassRoom classRoom) {
+		this.studentIdx = studentIdx;
 		this.classRoom = classRoom;
 
 		lblHelp.setForeground(Color.red);
 		lblHelp.setBackground(Color.gray);
 
-		lblStudent = new JLabel(student.toString());
+		lblStudent = new JLabel(DataBase.getName(studentIdx));
 		add(lblStudent);
 		nameInput.addKeyListener(new KeyAdapter() {
 			@Override
@@ -66,8 +66,8 @@ public class TableBase extends JPanel {
 	protected void applyStudentName() {
 		String[] names = nameInput.getText().split(" ");
 		if (names.length == 2) {
-			student.setName(names[0], names[1]);
-			lblStudent.setText(student.toString());
+			DataBase.setName(studentIdx, names[0], names[1]);
+			lblStudent.setText(DataBase.getName(studentIdx));
 			cancelRename();
 		} else {
 			add(lblHelp, BorderLayout.SOUTH);
@@ -79,12 +79,16 @@ public class TableBase extends JPanel {
 		remove(lblStudent);
 		setLayout(new BorderLayout());
 		add(nameInput, BorderLayout.NORTH);
-		nameInput.setText(student.toString());
+		nameInput.setText(DataBase.getName(studentIdx));
 		nameInput.setSize(new Dimension(getParent().getWidth(), nameInput.getHeight()));
 		nameInput.selectAll();
 		nameInput.setVisible(true);
 		nameInput.requestFocus();
 		validate();
+	}
+
+	public int student() {
+		return studentIdx;
 	}
 
 }

@@ -11,18 +11,21 @@ import java.awt.Point;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
+import net.sprauer.sitzplaner.view.helper.Parameter;
+
 public class Legende extends JComponent {
 
+	private static final int INVALID_VALUE = -10;
 	private static final long serialVersionUID = 6295984087908608613L;
-	private int value = -1;
+	private int value = INVALID_VALUE;
 
-	public Legende(Dimension size) {
+	public Legende() {
 		setLayout(new BorderLayout(10, 10));
 
-		JLabel lblOk = new JLabel(" BAD ");
+		JLabel lblOk = new JLabel(" GOOD ");
 		add(lblOk, BorderLayout.NORTH);
 
-		JLabel lblBad = new JLabel(" OK ");
+		JLabel lblBad = new JLabel(" BAD ");
 		add(lblBad, BorderLayout.SOUTH);
 		setLocation(0, 0);
 	}
@@ -41,7 +44,7 @@ public class Legende extends JComponent {
 	}
 
 	private void paintValueMarker(Graphics g) {
-		if (value < 0) {
+		if (value < INVALID_VALUE) {
 			return;
 		}
 		g.setColor(Color.white);
@@ -51,7 +54,7 @@ public class Legende extends JComponent {
 
 	private void paintBackground(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g.create();
-		g2.setPaint(new GradientPaint(new Point(0, 0), Color.red, new Point(0, getHeight()), Color.green));
+		g2.setPaint(new GradientPaint(new Point(0, 0), Color.green, new Point(0, getHeight()), Color.red));
 		g2.fillRect(0, 0, getWidth(), getHeight());
 		g2.dispose();
 	}
@@ -61,7 +64,7 @@ public class Legende extends JComponent {
 	}
 
 	public void setValue(int v) {
-		value = Math.min(100, Math.max(0, v));
+		value = (Math.min(5, Math.max(-5, v)) + 5) * 10;
 		repaint();
 	}
 
@@ -71,7 +74,7 @@ public class Legende extends JComponent {
 	}
 
 	public void hideValueMarker() {
-		value = -1;
+		value = INVALID_VALUE;
 		repaint();
 	}
 

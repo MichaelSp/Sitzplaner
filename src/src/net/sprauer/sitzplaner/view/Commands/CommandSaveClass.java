@@ -5,6 +5,9 @@ import java.awt.event.ActionEvent;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 
+import net.sprauer.sitzplaner.model.DataBase;
+import net.sprauer.sitzplaner.view.ClassRoom;
+
 public class CommandSaveClass extends AbstractCommand {
 
 	private static final long serialVersionUID = 7352333440353114802L;
@@ -21,7 +24,8 @@ public class CommandSaveClass extends AbstractCommand {
 		try {
 			final FileOutputStream fo = new FileOutputStream(selectedFile);
 			final ObjectOutputStream oos = new ObjectOutputStream(fo);
-			oos.writeObject(getModel());
+			oos.writeObject(ClassRoom.instance().getDimensions());
+			DataBase.saveTo(oos);
 			oos.close();
 		} catch (Exception ex) {
 			ex.printStackTrace();

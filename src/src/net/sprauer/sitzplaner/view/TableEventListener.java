@@ -5,6 +5,9 @@ import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import net.sprauer.sitzplaner.model.DataBase;
+import net.sprauer.sitzplaner.view.helper.Parameter;
+
 class TableEventListener extends MouseAdapter {
 	enum State {
 		Nothing, SourceHovered, SourceSelected, TargetHovered, EditRelationToStudent, EditPriority, TableMoving, BlackboardSelected, RenameStudent
@@ -40,7 +43,7 @@ class TableEventListener extends MouseAdapter {
 				} else {
 					state = State.SourceSelected;
 					table.setBackground(Color.lightGray);
-					table.classRoom.showRelationsFor(table.student);
+					table.classRoom.showRelationsFor(table.student());
 				}
 			} else if (state == State.EditRelationToStudent) {
 				state = State.SourceSelected;
@@ -89,17 +92,22 @@ class TableEventListener extends MouseAdapter {
 		mouseDownCoord = null;
 	}
 
+	private Color relationAsColor() {
+		int val = DataBase.relationBetween(source.student(), target.student());
+		return Table.getColorForValue(val);
+	}
+
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		if (state == State.TargetHovered) {
-			int relationValue = (int) (table.student.relationTo(target.student) * 10.0);
+			int relationValue = DataBase.relationBetween(table.student(), target.student());
 			table.classRoom.setRelationLine(table.getLocationOnScreen(), target.getLocationOnScreen(), relationValue);
 		} else if (state == State.SourceSelected || state == State.BlackboardSelected) {
 			Point blackboardPos = blackboardCenter();
 			if (e.getLocationOnScreen().y > blackboardPos.y) {
 				state = State.BlackboardSelected;
-				table.classRoom.setRelationLine(table.getLocationOnScreen(), blackboardPos,
-						(int) table.student.getFirstRowFactor());
+				int relationValue = DataBase.getPriority(table.student());
+				table.classRoom.setRelationLine(table.getLocationOnScreen(), blackboardPos, relationValue);
 				table.classRoom.blackboard.highlight(true);
 			} else {
 				state = State.SourceSelected;
@@ -120,7 +128,7 @@ class TableEventListener extends MouseAdapter {
 		if (state == State.Nothing) {
 			state = State.SourceHovered;
 			table.highlight(true);
-			table.classRoom.showRelationsFor(table.student);
+			table.classRoom.showRelationsFor(table.studentIdx);
 		} else if (state == State.SourceSelected && source != table) {
 			state = State.TargetHovered;
 			target = table;
@@ -139,7 +147,7 @@ class TableEventListener extends MouseAdapter {
 			state = State.SourceSelected;
 			target = null;
 			table.classRoom.legende.hideValueMarker();
-			table.classRoom.showRelationsFor(source.student);
+			table.classRoom.showRelationsFor(source.studentIdx);
 		} else if (state == State.EditRelationToStudent) {
 			state = State.Nothing;
 			source.setBackground(Table.DEFAULT_BACKGROUND_COLOR);
@@ -157,14 +165,9 @@ class TableEventListener extends MouseAdapter {
 		return blackboardPos;
 	}
 
-	static Color relationAsColor() {
-		double val = source.student.relationTo(target.student);
-		return new Color((int) (val * 255.0), (int) ((1.0 - val) * 255.0), 0);
-	}
-
-	public static void setRelationTo(Double relation) {
-		source.student.setRelationTo(TableEventListener.target.student, relation);
-		target.setBackground(TableEventListener.relationAsColor());
+	public static void setRelationTo(int relation) {
+		DataBase.setRelationBetween(source.student(), target.student(), relation);
+		target.setBackground(Table.getColorForValue(relation));
 	}
 
 	public static void reset() {

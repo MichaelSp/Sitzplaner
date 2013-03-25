@@ -1,23 +1,20 @@
 package net.sprauer.sitzplaner.model;
 
-import java.awt.Point;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sprauer.sitzplaner.view.Parameter;
-
 public class Student implements Serializable {
 
 	private static final long serialVersionUID = 9104891853035096375L;
+	private int index;
 	private String firstName;
 	private String lastName;
-	private double firstRowFactor;
-	public Point position;
-	private final Map<Student, Double> relations = new HashMap<Student, Double>();
+	private int firstRowPriority;
+	private final Map<Integer, Integer> relations = new HashMap<Integer, Integer>();
 
 	public Student() {
-		firstRowFactor = 1.0;
+		firstRowPriority = 1;
 	}
 
 	public Student(String fName, String lName) {
@@ -30,28 +27,19 @@ public class Student implements Serializable {
 		return firstName + " " + lastName;
 	}
 
-	public void setFirstRowFactor(double priority) {
-		this.firstRowFactor = priority;
+	public void setFirstRowFactor(int priority) {
+		this.firstRowPriority = priority;
 	}
 
-	public double getFirstRowFactor() {
-		return firstRowFactor;
+	public int getFirstRowPriority() {
+		return firstRowPriority;
 	}
 
-	public double getFirstRowFactor(int positionY) {
-		if (positionY < 0 || positionY > Parameter.numRows) {
-			return firstRowFactor;
+	public int relationTo(int index) {
+		if (relations.containsKey(index)) {
+			return relations.get(index);
 		} else {
-			int distanceToBlackboard = Parameter.numRows - positionY - 1;
-			return firstRowFactor * (distanceToBlackboard);
-		}
-	}
-
-	public Double relationTo(Student student) {
-		if (relations.containsKey(student)) {
-			return relations.get(student).doubleValue();
-		} else {
-			return 0.5;
+			return 0;
 		}
 	}
 
@@ -60,9 +48,13 @@ public class Student implements Serializable {
 		lastName = lName;
 	}
 
-	public void setRelationTo(Student student, Double value) {
-		student.relations.put(this, value);
+	public void setRelationTo(int student, Integer value) {
 		relations.put(student, value);
+		DataBase.getStudent(student).relations.put(index, value);
+	}
+
+	public int getIndex() {
+		return index;
 	}
 
 }

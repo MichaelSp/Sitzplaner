@@ -9,9 +9,11 @@ import java.io.FilenameFilter;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
-import net.sprauer.sitzplaner.MainWin;
-import net.sprauer.sitzplaner.EA.GeneString;
+import net.sprauer.sitzplaner.model.DataBase;
+import net.sprauer.sitzplaner.model.Population;
 import net.sprauer.sitzplaner.view.ClassRoom;
+import net.sprauer.sitzplaner.view.MainWin;
+import net.sprauer.sitzplaner.view.panels.StatisticsPanel;
 
 public abstract class AbstractCommand extends AbstractAction {
 
@@ -31,19 +33,11 @@ public abstract class AbstractCommand extends AbstractAction {
 	}
 
 	protected MainWin getMainWin() {
-		Component parent = getView().getParent();
+		Component parent = ClassRoom.instance().getParent();
 		while (!(parent instanceof MainWin) && parent != null) {
 			parent = parent.getParent();
 		}
 		return (MainWin) parent;
-	}
-
-	protected ClassRoom getView() {
-		return Factory.classView;
-	}
-
-	protected GeneString getModel() {
-		return Factory.classModel;
 	}
 
 	protected String getFile(int mode) {
@@ -66,5 +60,12 @@ public abstract class AbstractCommand extends AbstractAction {
 
 	public void invoke() {
 		actionPerformed(null);
+	}
+
+	protected void resetToNewClassSize(int classSize) {
+		ClassRoom.instance().clear();
+		DataBase.init(classSize);
+		Population.instance().clear();
+		StatisticsPanel.instance().clear();
 	}
 }

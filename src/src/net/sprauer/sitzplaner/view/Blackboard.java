@@ -5,6 +5,8 @@ import java.awt.Dimension;
 
 import javax.swing.JPanel;
 
+import net.sprauer.sitzplaner.view.helper.Parameter;
+
 public class Blackboard extends JPanel {
 
 	private static final Color DEFAULT_BLACKBOARD_COLOR = new Color(0, 60, 0);
@@ -15,8 +17,8 @@ public class Blackboard extends JPanel {
 	}
 
 	public void init(Dimension size) {
-		setSize(size.width - Parameter.blackboardBorder - Parameter.legendWidth, Parameter.blackboardHeight);
-		setLocation(Parameter.blackboardBorder / 2 + Parameter.legendWidth, size.height - Parameter.blackboardHeight);
+		setSize(Parameter.maxWidth, Parameter.blackboardHeight);
+		setLocation(Parameter.offsetX, size.height - Parameter.blackboardHeight);
 	}
 
 	public void highlight(boolean b) {

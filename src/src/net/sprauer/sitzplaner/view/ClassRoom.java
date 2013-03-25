@@ -9,27 +9,29 @@ import java.awt.Polygon;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.sprauer.sitzplaner.EA.GeneString;
-import net.sprauer.sitzplaner.model.Student;
+import net.sprauer.sitzplaner.EA.Chromosome;
+import net.sprauer.sitzplaner.model.DataBase;
+import net.sprauer.sitzplaner.view.helper.Parameter;
 
 public class ClassRoom extends JPanel {
 
 	private static final long serialVersionUID = -7794245134688207661L;
+	private static ClassRoom _instance;
 	private final List<Table> tables = new ArrayList<Table>();
 	final Blackboard blackboard;
 	private Polygon selectionLine;
-	private int selectionRelationValue;
+	private int selectedRelationValue;
 	ClassRoomEventListener eventListener;
-	final Legende legende;
+	Legende legende = null;
 	private final JLabel lblFitness;
+	private Chromosome chromosome;
 
-	public ClassRoom() {
-		Dimension size = new Dimension(760, 340);
-		setPreferredSize(size);
-		setMinimumSize(size);
+	private ClassRoom() {
+
 		eventListener = new ClassRoomEventListener(this);
 		addComponentListener(eventListener);
 		addMouseWheelListener(eventListener);
@@ -37,16 +39,28 @@ public class ClassRoom extends JPanel {
 		addMouseListener(eventListener);
 		setLayout(null);
 		blackboard = new Blackboard();
+		legende = new Legende();
+
+		Dimension size = new Dimension(800, 400);
+		applySize(size);
+
 		add(blackboard);
-		blackboard.init(size);
-		legende = new Legende(size);
 		add(legende);
 
 		lblFitness = new JLabel("0.0");
 		lblFitness.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		lblFitness.setBounds(0, 10, getWidth(), 20);
 		add(lblFitness);
+	}
+
+	private void applySize(Dimension size) {
+		setPreferredSize(size);
+		setMinimumSize(size);
+		blackboard.init(size);
 		legende.init(new Dimension(60, size.height - Parameter.blackboardHeight * 2));
+		if (getParent() != null) {
+			((JFrame) getParent().getParent().getParent().getParent().getParent()).pack();
+		}
 	}
 
 	@Override
@@ -59,36 +73,34 @@ public class ClassRoom extends JPanel {
 			g.drawLine(Parameter.offsetX + x * Parameter.widthFactor, Parameter.offsetY, Parameter.offsetX + x
 					* Parameter.widthFactor, Parameter.offsetY + Parameter.maxHeight);
 		}
-		for (int y = 0; y < Parameter.numRows + 2; y++) {
+		for (int y = 0; y < Parameter.numRows + 1; y++) {
 			g.drawLine(Parameter.offsetX, Parameter.offsetY + y * Parameter.heightFactor, Parameter.offsetX + Parameter.maxWidth,
 					Parameter.offsetY + y * Parameter.heightFactor);
 		}
 		if (selectionLine != null) {
-			g.setColor(selectionRelationValue < 0 ? Color.red : Color.black);
+			g.setColor(Color.black);
 			g.fillOval(selectionLine.xpoints[0] - 5, selectionLine.ypoints[0] - 5, 10, 10);
 			g.drawLine(selectionLine.xpoints[0], selectionLine.ypoints[0], selectionLine.xpoints[1], selectionLine.ypoints[1]);
-			if (selectionRelationValue >= 0) {
-				int x = selectionLine.xpoints[0] - (selectionLine.xpoints[0] - selectionLine.xpoints[1]) / 2;
-				int y = selectionLine.ypoints[0] - (selectionLine.ypoints[0] - selectionLine.ypoints[1]) / 2;
-				g.setFont(new Font("Arial", Font.BOLD, 16));
-				g.drawString("" + selectionRelationValue, x, y);
-			}
+
+			int x = selectionLine.xpoints[0] - (selectionLine.xpoints[0] - selectionLine.xpoints[1]) / 2;
+			int y = selectionLine.ypoints[0] - (selectionLine.ypoints[0] - selectionLine.ypoints[1]) / 2;
+			g.setFont(new Font("Arial", Font.BOLD, 16));
+			g.drawString("" + selectedRelationValue, x, y);
+
 		}
 	}
 
-	public void setModel(GeneString classModel) {
+	public void showChromosome(Chromosome chromosome) {
+		this.chromosome = chromosome;
 		clear();
 
-		for (Student student : classModel.getStudents()) {
-			Table table = new Table(student, this);
-			if (student.position == null) {
-				continue;
-			}
+		for (int i = 0; i < chromosome.size(); i++) {
+			Table table = new Table(i, this);
 			tables.add(table);
 			add(table);
-			table.setLocation(Table.coordsToPoint(student.position));
+			table.setPosition(chromosome.getPositionOf(i));
 		}
-		lblFitness.setText("" + classModel.getFitness());
+		lblFitness.setText("" + chromosome.getFitness());
 		validate();
 		setFocusable(true);
 		requestFocusInWindow();
@@ -110,17 +122,19 @@ public class ClassRoom extends JPanel {
 		setRelationLine(null, null, -1);
 	}
 
-	public void showRelationsFor(Student student) {
+	public void showRelationsFor(int index) {
+		TableBase hisTable = null;
 		for (Table table : tables) {
-			if (table.student == student) {
+			if (table.studentIdx == index) {
+				hisTable = table;
 				continue;
 			}
-			table.setColorForRelationTo(student);
+			table.setColorForRelationTo(index);
 		}
 		Point bbPos = new Point(blackboard.getLocationOnScreen());
-		Point tablePos = Table.coordsToPoint(student.position);
+		Point tablePos = hisTable.getLocation();
 		tablePos.translate(getLocationOnScreen().x, getLocationOnScreen().y);
-		setRelationLine(tablePos, bbPos, (int) (student.getFirstRowFactor() * 10));
+		setRelationLine(tablePos, bbPos, DataBase.getPriority(index));
 	}
 
 	public void setRelationLine(Point source, Point target, int relationValue) {
@@ -128,22 +142,22 @@ public class ClassRoom extends JPanel {
 			selectionLine = null;
 			legende.hideValueMarker();
 		} else {
-			source.translate(Parameter.tableWidth / 2, Parameter.tableHeight / 2);
-			target.translate(Parameter.tableWidth / 2, Parameter.tableHeight / 2);
+			source.translate(Parameter.cellWidth / 2, Parameter.cellHeight / 2);
+			target.translate(Parameter.cellWidth / 2, Parameter.cellHeight / 2);
 			source.translate(-getLocationOnScreen().x, -getLocationOnScreen().y);
 			target.translate(-getLocationOnScreen().x, -getLocationOnScreen().y);
 
 			selectionLine = new Polygon();
 			selectionLine.addPoint(source.x, source.y);
 			selectionLine.addPoint(target.x, target.y);
-			selectionRelationValue = relationValue;
-			legende.setValue(relationValue * 10);
+			selectedRelationValue = relationValue;
+			legende.setValue(relationValue);
 		}
 		repaint();
 	}
 
 	public void cancelEdit() {
-		for (Table tab : tables) {
+		for (TableBase tab : tables) {
 			tab.cancelRename();
 		}
 
@@ -153,5 +167,41 @@ public class ClassRoom extends JPanel {
 		legende.hideValueMarker();
 		validate();
 		repaint();
+	}
+
+	public static ClassRoom instance() {
+		if (_instance == null) {
+			_instance = new ClassRoom();
+		}
+		return _instance;
+	}
+
+	public void setNewDimensions(Dimension dim) {
+		Parameter.numCols = dim.width;
+		Parameter.numRows = dim.height;
+
+		clear();
+		Parameter.widthFactor = Parameter.cellWidth + Parameter.spacing / 2;
+		Parameter.heightFactor = Parameter.cellHeight + Parameter.spacing / 2;
+		Parameter.maxWidth = (Parameter.numCols) * Parameter.widthFactor;
+		Parameter.maxHeight = (Parameter.numRows) * Parameter.heightFactor;
+		Parameter.offsetX = (getWidth() - Parameter.maxWidth) / 2 + Parameter.legendWidth;
+		Parameter.offsetY = (getHeight() - Parameter.maxHeight) / 2;
+
+		Point size = Table.coordsToPoint(new Point(Parameter.numCols, Parameter.numRows));
+		applySize(getSize());
+		validate();
+		repaint();
+	}
+
+	public Dimension getDimensions() {
+		return new Dimension(Parameter.numCols, Parameter.numRows);
+	}
+
+	public void updateTablePositions() {
+		for (Table table : tables) {
+			table.setPosition(chromosome.getPositionOf(table.student()));
+		}
+		validate();
 	}
 }

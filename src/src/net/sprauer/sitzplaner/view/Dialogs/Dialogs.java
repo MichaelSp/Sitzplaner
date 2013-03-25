@@ -8,7 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-import net.sprauer.sitzplaner.view.Parameter;
+import net.sprauer.sitzplaner.view.helper.Parameter;
 
 public class Dialogs {
 

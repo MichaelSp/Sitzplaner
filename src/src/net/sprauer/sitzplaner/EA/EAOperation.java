@@ -1,6 +1,10 @@
 package net.sprauer.sitzplaner.EA;
 
-public interface EAOperation {
+public abstract class EAOperation {
 
-	void invoke(GeneString gene) throws Exception;
+	public abstract void invoke(Chromosome gene) throws Exception;
+
+	void invoke() throws Exception {
+		invoke(null);
+	}
 }
