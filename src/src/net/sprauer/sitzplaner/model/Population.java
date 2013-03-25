@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.naming.OperationNotSupportedException;
-
 import net.sprauer.sitzplaner.EA.Chromosome;
 
 public class Population {
@@ -26,12 +24,12 @@ public class Population {
 
 	}
 
-	public Chromosome newChildOf(Chromosome parent) throws OperationNotSupportedException {
+	public Chromosome newChildOf(Chromosome parent) {
 		Chromosome c = null;
 		if (parent == null) {
 			c = new Chromosome();
 		} else {
-			throw new OperationNotSupportedException("Unimplemented");
+			return parent.swap(DataBase.size() / 4);
 		}
 		return c;
 	}

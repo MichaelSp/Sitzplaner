@@ -2,13 +2,14 @@ package net.sprauer.sitzplaner.EA;
 
 import java.awt.Point;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 
 import net.sprauer.sitzplaner.model.DataBase;
 
-public class Chromosome implements Iterable<Point>, Comparable<Chromosome>, Serializable {
+public class Chromosome implements Iterable<Point>, Comparable<Chromosome>, Serializable, Cloneable {
 
 	private static final long serialVersionUID = -3578751251444286705L;
 	private double fitness = -1;
@@ -63,5 +64,24 @@ public class Chromosome implements Iterable<Point>, Comparable<Chromosome>, Seri
 		} else {
 			return -1;
 		}
+	}
+
+	public Chromosome swap(int times) {
+		Chromosome chrome;
+		try {
+			chrome = (Chromosome) this.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+			return new Chromosome();
+		}
+		chrome.fitness = -1;
+		for (int y = 0; y < times; y++) {
+			int i = (int) (Math.random() * positions.size());
+			int j = (int) (Math.random() * positions.size());
+			positionMap.put(positions.get(i), j);
+			positionMap.put(positions.get(j), i);
+			Collections.swap(positions, i, j);
+		}
+		return chrome;
 	}
 }

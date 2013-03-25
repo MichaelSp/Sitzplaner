@@ -9,32 +9,35 @@ import net.sprauer.sitzplaner.model.Student;
 
 public class OperationFitness extends EAOperation {
 
+	private Chromosome gene;
+
 	@Override
 	public void invoke(Chromosome gene) throws Exception {
+		this.gene = gene;
 		double fitness = 0;
 		for (int i = 0; i < gene.size(); i++) {
-			fitness += fitnessFor(gene, DataBase.getStudent(i), gene.getPositionOf(i));
+			fitness += fitnessFor(DataBase.getStudent(i), gene.getPositionOf(i));
 		}
 		gene.setFitness(fitness);
 	}
 
-	private double fitnessFor(Chromosome gene, Student student, Point position) {
+	private double fitnessFor(Student student, Point position) {
 		double fitness = 0;
 		fitness += getPriorityValueOf(student, position.y);
-		fitness += getRelationsFor(gene, student, position);
+		fitness += getRelationsFor(student, position);
 		return fitness;
 	}
 
-	private double getRelationsFor(Chromosome current, Student student, Point position) {
+	private double getRelationsFor(Student student, Point position) {
 		double fitness = 0;
-		fitness += relationToRight(current, student, position) * 0;
-		fitness += student.relationTo(current.studentAt(rightOf(rightOf(position))));
-		fitness += student.relationTo(current.studentAt(under(position)));
+		fitness += relationToRight(student, position) * 1;
+		fitness += student.relationTo(gene.studentAt(rightOf(rightOf(position))));
+		fitness += student.relationTo(gene.studentAt(under(position)));
 		return fitness;
 	}
 
-	private int relationToRight(Chromosome current, Student student, Point currentStudentsPosition) {
-		return student.relationTo(current.studentAt(rightOf(currentStudentsPosition)));
+	private int relationToRight(Student student, Point currentStudentsPosition) {
+		return student.relationTo(gene.studentAt(rightOf(currentStudentsPosition)));
 	}
 
 	private Point under(Point oldPos) {

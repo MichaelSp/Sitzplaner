@@ -3,6 +3,7 @@ package net.sprauer.sitzplaner.EA;
 import net.sprauer.sitzplaner.EA.operations.OperationFitness;
 import net.sprauer.sitzplaner.EA.operations.OperationGreedy;
 import net.sprauer.sitzplaner.exceptions.ClassRoomToSmallException;
+import net.sprauer.sitzplaner.model.Population;
 import net.sprauer.sitzplaner.view.panels.StatisticsPanel;
 
 public class EAFactory {
@@ -23,5 +24,11 @@ public class EAFactory {
 	}
 
 	public static void optimize() throws ClassRoomToSmallException {
+		newGeneration();
+	}
+
+	private static void newGeneration() {
+		Population pop = Population.instance();
+		pop.add(pop.newChildOf(pop.getBestSolution()));
 	}
 }
