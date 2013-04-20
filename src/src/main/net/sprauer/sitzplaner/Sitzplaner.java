@@ -3,6 +3,7 @@ package net.sprauer.sitzplaner;
 import java.io.File;
 
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import net.sprauer.sitzplaner.view.MainWin;
 import net.sprauer.sitzplaner.view.Commands.Factory;
@@ -13,6 +14,8 @@ public class Sitzplaner {
 
 	public Sitzplaner(String defaultFile) {
 
+		setStyle();
+
 		mainWin = new MainWin();
 		Factory.init();
 		mainWin.initView();
@@ -21,6 +24,13 @@ public class Sitzplaner {
 			Factory.CommandLoadClass.loadFrom(defaultFile);
 		} else {
 			System.err.println("Unable to load: " + defaultFile);
+		}
+	}
+
+	private void setStyle() {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
 		}
 	}
 
