@@ -1,7 +1,6 @@
 package net.sprauer.sitzplaner.view;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.KeyAdapter;
@@ -23,14 +22,10 @@ public class TableBase extends JPanel {
 	protected final ClassRoom classRoom;
 	protected final JTextField nameInput = new JTextField();
 	protected final JLabel lblStudent;
-	protected final JLabel lblHelp = new JLabel("Vorname Nachname");
 
 	public TableBase(int studentIdx, ClassRoom classRoom) {
 		this.studentIdx = studentIdx;
 		this.classRoom = classRoom;
-
-		lblHelp.setForeground(Color.red);
-		lblHelp.setBackground(Color.gray);
 
 		lblStudent = new JLabel(DataBase.instance().getName(studentIdx));
 		add(lblStudent);
@@ -57,22 +52,16 @@ public class TableBase extends JPanel {
 		TableEventListener.state = State.Nothing;
 		nameInput.setVisible(false);
 		remove(nameInput);
-		remove(lblHelp);
 		setLayout(new FlowLayout());
 		add(lblStudent);
 		validate();
 	}
 
 	protected void applyStudentName() {
-		String[] names = nameInput.getText().split(" ");
-		if (names.length == 2) {
-			DataBase.instance().setName(studentIdx, names[0], names[1]);
-			lblStudent.setText(DataBase.instance().getName(studentIdx));
-			cancelRename();
-		} else {
-			add(lblHelp, BorderLayout.SOUTH);
-			validate();
-		}
+		DataBase.instance().setName(studentIdx, nameInput.getText());
+		lblStudent.setText(DataBase.instance().getName(studentIdx));
+		cancelRename();
+
 	}
 
 	public void rename() {
@@ -89,6 +78,10 @@ public class TableBase extends JPanel {
 
 	public int student() {
 		return studentIdx;
+	}
+
+	public void updateName() {
+		lblStudent.setText(DataBase.instance().getName(studentIdx));
 	}
 
 }

@@ -2,10 +2,18 @@ package net.sprauer.sitzplaner.model;
 
 import static org.junit.Assert.assertEquals;
 
+import java.awt.Point;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+
 import org.junit.Before;
 import org.junit.Test;
 
 public class DataBaseTest {
+
+	private static final String STUDENT_NAME = "first last";
+	private final Random rand = new Random(System.nanoTime());
 
 	@Before
 	public void setup() {
@@ -25,10 +33,10 @@ public class DataBaseTest {
 		DataBase db = DataBase.instance();
 		db.setSize(3);
 		for (int i = 0; i < 3; i++) {
-			db.setName(i, "first", "last");
+			db.setName(i, STUDENT_NAME);
 		}
 		for (int i = 0; i < 3; i++) {
-			assertEquals("first last", db.getName(i));
+			assertEquals(STUDENT_NAME, db.getName(i));
 		}
 	}
 
@@ -38,6 +46,44 @@ public class DataBaseTest {
 		db.setSize(3);
 		db.setRelationBetween(0, 1, 20);
 		assertEquals(20, db.relationBetween(1, 0));
+	}
+
+	@Test
+	public void testMoreRelations() {
+		DataBase db = DataBase.instance();
+		db.setSize(50);
+
+		Map<Integer, Point> relations = createRelations(30);
+		// check relations
+		for (int i = 0; i < DataBase.instance().getSize(); i++) {
+			Point expected = relations.get(i);
+			for (int j = 0; j < DataBase.instance().getSize(); j++) {
+				int relationij = DataBase.instance().relationBetween(i, j);
+				int relationji = DataBase.instance().relationBetween(j, i);
+				assertEquals("ij == ji", relationij, relationji);
+
+				if (expected == null || expected.x != j) {
+					continue;
+				}
+				assertEquals("relation " + i + "to" + j, expected.y, relationij);
+				assertEquals("relation " + i + "to" + j, expected.y, relationji);
+			}
+		}
+	}
+
+	private Map<Integer, Point> createRelations(int relationCount) {
+		Map<Integer, Point> relations = new HashMap<Integer, Point>();
+		for (int i = 0; i < relationCount; i++) {
+			int relation = rand.nextInt(10) - 5;
+			int target = rand.nextInt(DataBase.instance().getSize());
+			if (target == i) {
+				i--; // try again
+				continue;
+			}
+			relations.put(i, new Point(target, relation));
+			DataBase.instance().setRelationBetween(i, target, relation);
+		}
+		return relations;
 	}
 
 	@Test

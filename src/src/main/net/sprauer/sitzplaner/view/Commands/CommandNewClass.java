@@ -2,7 +2,7 @@ package net.sprauer.sitzplaner.view.Commands;
 
 import java.awt.event.ActionEvent;
 
-import net.sprauer.sitzplaner.view.Dialogs.Dialogs;
+import net.sprauer.sitzplaner.view.panels.ToolsPanel;
 
 public class CommandNewClass extends AbstractCommand {
 
@@ -11,10 +11,7 @@ public class CommandNewClass extends AbstractCommand {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
-		int classSize = Dialogs.getClassSize();
-		if (classSize < 0) {
-			return;
-		}
+		int classSize = ToolsPanel.instance().getClassSize();
 		resetToNewClassSize(classSize);
 		Factory.CommandNewSeatingPlan.invoke();
 	}
@@ -26,7 +23,7 @@ public class CommandNewClass extends AbstractCommand {
 
 	@Override
 	public String getToolTip() {
-		return "Erzeugt eine neue Klasse mit der angegebenen Größe";
+		return "Erzeugt eine neue Klasse mit der angegebenen GrÃ¶ÃŸe";
 	}
 
 }

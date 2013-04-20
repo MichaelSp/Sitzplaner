@@ -2,6 +2,7 @@ package net.sprauer.sitzplaner.EA;
 
 import net.sprauer.sitzplaner.EA.operations.OperationFitness;
 import net.sprauer.sitzplaner.EA.operations.OperationGreedy;
+import net.sprauer.sitzplaner.model.DataBase;
 import net.sprauer.sitzplaner.model.Generation;
 
 public class EAFactory {
@@ -21,7 +22,7 @@ public class EAFactory {
 	}
 
 	public static Chromosome nextGeneration() throws Exception {
-		if (currentGeneration == null) {
+		if (currentGeneration == null || currentGeneration.size() != DataBase.instance().getSize()) {
 			currentGeneration = greedy();
 		}
 		Generation generation = new Generation(currentGeneration, POPULATION_SIZE);

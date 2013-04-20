@@ -7,9 +7,8 @@ import java.util.Set;
 public class Student implements Serializable {
 
 	private static final long serialVersionUID = 9104891853035096375L;
-	private int index;
-	private String firstName;
-	private String lastName;
+	int index;
+	private String name;
 	private int firstRowPriority;
 	private final HashMap<Integer, Integer> relations = new HashMap<Integer, Integer>();
 
@@ -17,14 +16,14 @@ public class Student implements Serializable {
 		firstRowPriority = 1;
 	}
 
-	public Student(String fName, String lName) {
-		firstName = fName;
-		lastName = lName;
+	public Student(int index) {
+		this.index = index;
+		this.name = (char) (index + 'A') + " " + (char) (index + 'A');
 	}
 
 	@Override
 	public String toString() {
-		return firstName + " " + lastName;
+		return name;
 	}
 
 	public void setFirstRowFactor(int priority) {
@@ -43,9 +42,8 @@ public class Student implements Serializable {
 		}
 	}
 
-	public void setName(String fName, String lName) {
-		firstName = fName;
-		lastName = lName;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public void setRelationTo(int student, Integer value) {
@@ -57,6 +55,8 @@ public class Student implements Serializable {
 		}
 		relations.put(student, value);
 		DataBase.instance().getStudent(student).relations.put(index, value);
+		dumpRelations();
+		DataBase.instance().getStudent(student).dumpRelations();
 	}
 
 	public int getIndex() {
@@ -64,12 +64,11 @@ public class Student implements Serializable {
 	}
 
 	public void dumpRelations() {
-		System.out.println("======" + toString() + "=============");
+		System.out.println("[" + index + "]======" + toString());
 		Set<Integer> keySet = relations.keySet();
 		for (Integer key : keySet) {
 			Integer value = relations.get(key);
 			System.out.println("\t" + key + "=" + value);
 		}
 	}
-
 }

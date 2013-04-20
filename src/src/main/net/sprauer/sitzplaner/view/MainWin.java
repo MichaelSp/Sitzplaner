@@ -1,18 +1,13 @@
 package net.sprauer.sitzplaner.view;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 import javax.swing.JFrame;
-import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.ListSelectionModel;
-import javax.swing.border.LineBorder;
 
-import net.sprauer.sitzplaner.model.DataBase;
 import net.sprauer.sitzplaner.view.panels.StatisticsPanel;
 import net.sprauer.sitzplaner.view.panels.ToolsPanel;
 
@@ -21,7 +16,6 @@ public class MainWin extends JFrame {
 	private static final long serialVersionUID = 885528719398690039L;
 	private final JPanel clsRoomPanel;
 	private final ToolsPanel toolsPanel;
-	private final JList lstNames;
 
 	public MainWin() {
 		super("Sitzplaner");
@@ -41,31 +35,21 @@ public class MainWin extends JFrame {
 		gbc_toolsPanel.gridy = 0;
 		getContentPane().add(toolsPanel, gbc_toolsPanel);
 
-		lstNames = new JList();
-		lstNames.setBorder(new LineBorder(new Color(0, 0, 0)));
-		lstNames.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		GridBagConstraints gbc_lstNames = new GridBagConstraints();
-		gbc_lstNames.fill = GridBagConstraints.BOTH;
-		gbc_lstNames.insets = new Insets(6, 6, 6, 6);
-		gbc_lstNames.gridx = 0;
-		gbc_lstNames.gridy = 1;
-		getContentPane().add(lstNames, gbc_lstNames);
-		lstNames.setModel(DataBase.instance());
-
 		clsRoomPanel = new JPanel();
 		GridBagConstraints gbc_clsRoomPanel = new GridBagConstraints();
+		gbc_clsRoomPanel.gridwidth = 2;
 		gbc_clsRoomPanel.fill = GridBagConstraints.BOTH;
 		gbc_clsRoomPanel.insets = new Insets(6, 6, 6, 6);
-		gbc_clsRoomPanel.gridx = 1;
+		gbc_clsRoomPanel.gridx = 0;
 		gbc_clsRoomPanel.gridy = 1;
 		getContentPane().add(clsRoomPanel, gbc_clsRoomPanel);
 		clsRoomPanel.setLayout(new BorderLayout(8, 8));
 
 		StatisticsPanel statisticsPanel = new StatisticsPanel();
 		GridBagConstraints gbc_statisticsPanel = new GridBagConstraints();
+		gbc_statisticsPanel.gridwidth = 2;
 		gbc_statisticsPanel.weightx = 1.0;
 		gbc_statisticsPanel.fill = GridBagConstraints.VERTICAL;
-		gbc_statisticsPanel.gridwidth = 2;
 		gbc_statisticsPanel.insets = new Insets(6, 6, 6, 6);
 		gbc_statisticsPanel.gridx = 0;
 		gbc_statisticsPanel.gridy = 2;

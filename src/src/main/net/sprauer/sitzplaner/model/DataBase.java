@@ -22,8 +22,8 @@ public class DataBase extends AbstractListModel {
 		return students.size();
 	}
 
-	public void setName(int index, String firstName, String lastName) {
-		students.get(index).setName(firstName, lastName);
+	public void setName(int index, String name) {
+		students.get(index).setName(name);
 		fireContentsChanged(this, index, index);
 	}
 
@@ -36,7 +36,7 @@ public class DataBase extends AbstractListModel {
 	}
 
 	private Student createStudent(int i) {
-		return new Student((char) (i + 'A') + "", "" + (char) (i + 'A'));
+		return new Student(i);
 	}
 
 	public int relationBetween(int source, int target) {
