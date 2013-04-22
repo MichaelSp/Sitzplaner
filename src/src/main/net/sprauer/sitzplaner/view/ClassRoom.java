@@ -31,7 +31,6 @@ public class ClassRoom extends JPanel {
 	private Chromosome chromosome;
 
 	private ClassRoom() {
-
 		eventListener = new ClassRoomEventListener(this);
 		addComponentListener(eventListener);
 		addMouseWheelListener(eventListener);
@@ -91,8 +90,12 @@ public class ClassRoom extends JPanel {
 	}
 
 	public void showChromosome(Chromosome chromosome) {
-		this.chromosome = chromosome;
+		if (this.chromosome != null && this.chromosome.getFitness() > chromosome.getFitness()) {
+			return;
+		}
 		clear();
+		this.chromosome = chromosome;
+		System.out.println("display: " + chromosome + "\t" + this.chromosome);
 
 		for (int i = 0; i < chromosome.size(); i++) {
 			Table table = new Table(i, this);
@@ -107,6 +110,7 @@ public class ClassRoom extends JPanel {
 	}
 
 	public void clear() {
+		chromosome = null;
 		for (TableBase table : tables) {
 			remove(table);
 		}

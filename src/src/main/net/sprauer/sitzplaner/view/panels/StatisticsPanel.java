@@ -120,5 +120,7 @@ public class StatisticsPanel extends JPanel {
 
 	public void clear() {
 		series.clear();
+		fitnessValue.setText("0.0");
+		validate();
 	}
 }

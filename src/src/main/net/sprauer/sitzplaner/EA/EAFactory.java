@@ -10,15 +10,15 @@ public class EAFactory {
 	private static final int POPULATION_SIZE = 1;
 	static Chromosome currentGeneration;
 
+	static double fitness(Chromosome gene) throws Exception {
+		new OperationFitness().invoke(gene);
+		return gene.getFitness();
+	}
+
 	public static Chromosome greedy() throws Exception {
 		Chromosome chrome = new Chromosome();
 		new OperationGreedy().invoke(chrome);
 		return chrome;
-	}
-
-	public static double fitness(Chromosome gene) throws Exception {
-		new OperationFitness().invoke(gene);
-		return gene.getFitness();
 	}
 
 	public static Chromosome nextGeneration() throws Exception {
@@ -28,6 +28,10 @@ public class EAFactory {
 		Generation generation = new Generation(currentGeneration, POPULATION_SIZE);
 		currentGeneration = generation.getBestSolution();
 		return currentGeneration;
+	}
+
+	public static void resetGeneration() {
+		currentGeneration = null;
 	}
 
 }
