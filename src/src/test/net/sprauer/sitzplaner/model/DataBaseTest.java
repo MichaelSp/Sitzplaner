@@ -54,7 +54,10 @@ public class DataBaseTest {
 		db.setSize(50);
 
 		Map<Integer, Point> relations = createRelations(30);
-		// check relations
+		checkRelations(relations);
+	}
+
+	private void checkRelations(Map<Integer, Point> relations) {
 		for (int i = 0; i < DataBase.instance().getSize(); i++) {
 			Point expected = relations.get(i);
 			for (int j = 0; j < DataBase.instance().getSize(); j++) {

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.UUID;
 import java.util.Vector;
 
 import net.sprauer.sitzplaner.model.DataBase;
@@ -14,9 +15,10 @@ public class Chromosome implements Iterable<Point>, Comparator<Chromosome>, Seri
 
 	private static final long serialVersionUID = -3578751251444286705L;
 	private double fitness = -1;
-	private final Vector<Point> positions = new Vector<Point>();
-	private final HashMap<Point, Integer> positionMap = new HashMap<Point, Integer>();
+	private Vector<Point> positions = new Vector<Point>();
+	private HashMap<Point, Integer> positionMap = new HashMap<Point, Integer>();
 	private boolean calculating;
+	public String id = UUID.randomUUID().toString();
 
 	public Chromosome() {
 		positions.setSize(DataBase.instance().getSize());
@@ -71,10 +73,14 @@ public class Chromosome implements Iterable<Point>, Comparator<Chromosome>, Seri
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public Chromosome swap(int times) {
 		Chromosome chrome;
 		try {
 			chrome = (Chromosome) this.clone();
+			chrome.positionMap = (HashMap<Point, Integer>) positionMap.clone();
+			chrome.positions = (Vector<Point>) positions.clone();
+			chrome.id = UUID.randomUUID().toString();
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
 			return new Chromosome();
@@ -88,5 +94,10 @@ public class Chromosome implements Iterable<Point>, Comparator<Chromosome>, Seri
 			Collections.swap(positions, i, j);
 		}
 		return chrome;
+	}
+
+	@Override
+	public String toString() {
+		return id + "(" + fitness + ")";
 	}
 }

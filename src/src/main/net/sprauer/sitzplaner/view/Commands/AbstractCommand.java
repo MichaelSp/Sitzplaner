@@ -9,6 +9,7 @@ import java.io.FilenameFilter;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
+import net.sprauer.sitzplaner.EA.EAFactory;
 import net.sprauer.sitzplaner.model.DataBase;
 import net.sprauer.sitzplaner.view.ClassRoom;
 import net.sprauer.sitzplaner.view.MainWin;
@@ -65,6 +66,7 @@ public abstract class AbstractCommand extends AbstractAction {
 		ClassRoom.instance().clear();
 		DataBase.instance().clear();
 		DataBase.instance().setSize(classSize);
+		EAFactory.resetGeneration();
 		StatisticsPanel.instance().clear();
 	}
 }

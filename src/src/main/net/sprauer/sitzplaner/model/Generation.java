@@ -17,19 +17,17 @@ public class Generation {
 	}
 
 	public Chromosome newChildOf(Chromosome parent) {
-		Chromosome c = null;
 		if (parent == null) {
-			c = new Chromosome();
+			return new Chromosome();
 		} else {
 			return parent.swap(DataBase.instance().getSize() / 4);
 		}
-		return c;
 	}
 
 	private void dump() {
 		System.out.println("============================ " + getBestSolution().getFitness());
 		for (Chromosome ch : population) {
-			System.out.println(ch.getFitness());
+			System.out.println(ch);
 		}
 	}
 
@@ -44,7 +42,12 @@ public class Generation {
 
 	public void add(Chromosome chrome) {
 		population.add(chrome);
-		if (bestSolution == null || chrome.getFitness() > bestSolution.getFitness()) {
+		if (bestSolution == null || chrome.getFitness() >= bestSolution.getFitness()) {
+			if (bestSolution == null) {
+				System.out.println("\nadam = " + chrome);
+			} else {
+				System.out.println("best = " + chrome);
+			}
 			bestSolution = chrome;
 		}
 	}
