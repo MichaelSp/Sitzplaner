@@ -73,8 +73,30 @@ public class Chromosome implements Iterable<Point>, Comparator<Chromosome>, Seri
 		}
 	}
 
-	@SuppressWarnings("unchecked")
+	@Override
+	public String toString() {
+		return id + "(" + fitness + ")";
+	}
+
 	public Chromosome swap(int times) {
+		Chromosome chrome = doClone();
+		chrome.fitness = -1;
+		chrome.doSwap(times);
+		return chrome;
+	}
+
+	private void doSwap(int times) {
+		for (int y = 0; y < times; y++) {
+			int i = (int) (Math.random() * positions.size());
+			int j = (int) (Math.random() * positions.size());
+			positionMap.put(positions.get(i), j);
+			positionMap.put(positions.get(j), i);
+			Collections.swap(positions, i, j);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private Chromosome doClone() {
 		Chromosome chrome;
 		try {
 			chrome = (Chromosome) this.clone();
@@ -85,19 +107,6 @@ public class Chromosome implements Iterable<Point>, Comparator<Chromosome>, Seri
 			e.printStackTrace();
 			return new Chromosome();
 		}
-		chrome.fitness = -1;
-		for (int y = 0; y < times; y++) {
-			int i = (int) (Math.random() * positions.size());
-			int j = (int) (Math.random() * positions.size());
-			positionMap.put(positions.get(i), j);
-			positionMap.put(positions.get(j), i);
-			Collections.swap(positions, i, j);
-		}
 		return chrome;
-	}
-
-	@Override
-	public String toString() {
-		return id + "(" + fitness + ")";
 	}
 }

@@ -95,7 +95,7 @@ public class ClassRoom extends JPanel {
 		}
 		clear();
 		this.chromosome = chromosome;
-		System.out.println("display: " + chromosome + "\t" + this.chromosome);
+		System.out.println("display: " + this.chromosome);
 
 		for (int i = 0; i < chromosome.size(); i++) {
 			Table table = new Table(i, this);

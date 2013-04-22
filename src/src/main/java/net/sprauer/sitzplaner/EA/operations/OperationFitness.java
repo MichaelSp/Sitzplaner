@@ -10,10 +10,10 @@ import net.sprauer.sitzplaner.model.Student;
 public class OperationFitness extends EAOperation {
 
 	private Chromosome gene;
-	private final int WEIGHT_PRIORITY = 1;
-	private final int WEIGHT_RIGHT = 1;
-	private final int WEIGHT_RIGHT_RIGHT = 1;
-	private final int WEIGHT_BEHIND = 1;
+	private static int WEIGHT_PRIORITY = 1;
+	private static int WEIGHT_RIGHT = 1;
+	private static int WEIGHT_RIGHT_RIGHT = 1;
+	private static int WEIGHT_BEHIND = 1;
 
 	@Override
 	public void invoke(Chromosome gene) throws Exception {
