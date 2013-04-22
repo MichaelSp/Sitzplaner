@@ -49,7 +49,7 @@ public class MainWin extends JFrame {
 		GridBagConstraints gbc_statisticsPanel = new GridBagConstraints();
 		gbc_statisticsPanel.gridwidth = 2;
 		gbc_statisticsPanel.weightx = 1.0;
-		gbc_statisticsPanel.fill = GridBagConstraints.VERTICAL;
+		gbc_statisticsPanel.fill = GridBagConstraints.BOTH;
 		gbc_statisticsPanel.insets = new Insets(6, 6, 6, 6);
 		gbc_statisticsPanel.gridx = 0;
 		gbc_statisticsPanel.gridy = 2;

@@ -55,8 +55,6 @@ public class Student implements Serializable {
 		}
 		relations.put(student, value);
 		DataBase.instance().getStudent(student).relations.put(index, value);
-		dumpRelations();
-		DataBase.instance().getStudent(student).dumpRelations();
 	}
 
 	public int getIndex() {

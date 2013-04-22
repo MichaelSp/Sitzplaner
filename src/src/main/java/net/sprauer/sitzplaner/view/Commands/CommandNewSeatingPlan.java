@@ -15,7 +15,7 @@ public class CommandNewSeatingPlan extends AbstractCommand {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		try {
-			Chromosome nextGen = EAFactory.nextGeneration();
+			Chromosome nextGen = EAFactory.nextGenerations();
 			ClassRoom.instance().showChromosome(nextGen);
 			StatisticsPanel.instance().addFitness(nextGen.getFitness());
 		} catch (ClassRoomToSmallException e1) {

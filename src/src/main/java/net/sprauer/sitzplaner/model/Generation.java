@@ -43,11 +43,6 @@ public class Generation {
 	public void add(Chromosome chrome) {
 		population.add(chrome);
 		if (bestSolution == null || chrome.getFitness() >= bestSolution.getFitness()) {
-			if (bestSolution == null) {
-				System.out.println("\nadam = " + chrome);
-			} else {
-				System.out.println("best = " + chrome);
-			}
 			bestSolution = chrome;
 		}
 	}

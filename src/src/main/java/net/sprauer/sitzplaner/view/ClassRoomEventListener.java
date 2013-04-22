@@ -19,6 +19,10 @@ public class ClassRoomEventListener extends ComponentAdapter implements MouseWhe
 
 	public ClassRoomEventListener(ClassRoom classRoom) {
 		this.classRoom = classRoom;
+		this.classRoom.addComponentListener(this);
+		this.classRoom.addMouseWheelListener(this);
+		this.classRoom.addKeyListener(this);
+		this.classRoom.addMouseListener(this);
 	}
 
 	@Override

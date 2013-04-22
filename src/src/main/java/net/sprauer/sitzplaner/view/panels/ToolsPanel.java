@@ -15,6 +15,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.sprauer.sitzplaner.EA.EAFactory;
 import net.sprauer.sitzplaner.model.DataBase;
 import net.sprauer.sitzplaner.view.ClassRoom;
 import net.sprauer.sitzplaner.view.Commands.Factory;
@@ -35,6 +36,13 @@ public class ToolsPanel extends JPanel {
 	private JTabbedPane tabbedPane;
 	private JLabel lblClassSize;
 	private JButton btnCreate;
+	private JPanel panel;
+	private JLabel lblGenerationSize;
+	private JSpinner spnGenerationSize;
+	private JLabel lblNumberOfGenerations;
+	private JSpinner spnNumberOfGenerations;
+	private static final int DEFAULT_NUMBER_OF_GENERATIONS = 100;
+	private static final int DEFAULT_POPULATION_SIZE = 20;
 
 	public ToolsPanel() {
 		_instance = this;
@@ -58,10 +66,10 @@ public class ToolsPanel extends JPanel {
 		SpinnerNumberModel colSpinnerModel = createColSpinnerModel(classDimensionChangeListener);
 
 		GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWidths = new int[] { 150, 80, 0 };
+		gridBagLayout.columnWidths = new int[] { 310, 0, 181, 0 };
 		gridBagLayout.rowHeights = new int[] { 97, 0 };
-		gridBagLayout.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
-		gridBagLayout.rowWeights = new double[] { 1.0, Double.MIN_VALUE };
+		gridBagLayout.columnWeights = new double[] { 0.0, 0.0, 1.0, Double.MIN_VALUE };
+		gridBagLayout.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
 		setLayout(gridBagLayout);
 
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -167,7 +175,6 @@ public class ToolsPanel extends JPanel {
 
 		btnLoadClass = new JButton();
 		GridBagConstraints gbc_btnLoadClass = new GridBagConstraints();
-		gbc_btnLoadClass.anchor = GridBagConstraints.WEST;
 		gbc_btnLoadClass.insets = new Insets(0, 0, 5, 0);
 		gbc_btnLoadClass.gridx = 0;
 		gbc_btnLoadClass.gridy = 0;
@@ -175,17 +182,87 @@ public class ToolsPanel extends JPanel {
 
 		btnSaveClass = new JButton();
 		GridBagConstraints gbc_btnSaveClass = new GridBagConstraints();
-		gbc_btnSaveClass.anchor = GridBagConstraints.NORTHWEST;
+		gbc_btnSaveClass.anchor = GridBagConstraints.NORTH;
 		gbc_btnSaveClass.gridx = 0;
 		gbc_btnSaveClass.gridy = 1;
 		pnlLoadAndSave.add(btnSaveClass, gbc_btnSaveClass);
 
 		btnNewSeatingPlan = new JButton();
 		GridBagConstraints gbc_btnNewSeatingPlan = new GridBagConstraints();
+		gbc_btnNewSeatingPlan.insets = new Insets(0, 0, 0, 5);
 		gbc_btnNewSeatingPlan.gridx = 1;
 		gbc_btnNewSeatingPlan.gridy = 0;
 		add(btnNewSeatingPlan, gbc_btnNewSeatingPlan);
 
+		panel = new JPanel();
+		panel.setBorder(new TitledBorder(null, "Settings", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		GridBagConstraints gbc_panel = new GridBagConstraints();
+		gbc_panel.ipady = 10;
+		gbc_panel.ipadx = 10;
+		gbc_panel.fill = GridBagConstraints.BOTH;
+		gbc_panel.gridx = 2;
+		gbc_panel.gridy = 0;
+		add(panel, gbc_panel);
+		GridBagLayout gbl_panel = new GridBagLayout();
+		gbl_panel.columnWidths = new int[] { 0, 0, 0 };
+		gbl_panel.rowHeights = new int[] { 0, 0, 0 };
+		gbl_panel.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
+		gbl_panel.rowWeights = new double[] { 0.0, 0.0, Double.MIN_VALUE };
+		panel.setLayout(gbl_panel);
+
+		lblGenerationSize = new JLabel("Generation Size");
+		GridBagConstraints gbc_lblGenerationSize = new GridBagConstraints();
+		gbc_lblGenerationSize.anchor = GridBagConstraints.EAST;
+		gbc_lblGenerationSize.insets = new Insets(0, 0, 5, 5);
+		gbc_lblGenerationSize.gridx = 0;
+		gbc_lblGenerationSize.gridy = 0;
+		panel.add(lblGenerationSize, gbc_lblGenerationSize);
+
+		spnGenerationSize = new JSpinner();
+		spnGenerationSize.setModel(new SpinnerNumberModel(DEFAULT_POPULATION_SIZE, 1, 1000000, 1));
+		GridBagConstraints gbc_spnGenerationSize = new GridBagConstraints();
+		gbc_spnGenerationSize.fill = GridBagConstraints.HORIZONTAL;
+		gbc_spnGenerationSize.insets = new Insets(0, 0, 5, 0);
+		gbc_spnGenerationSize.gridx = 1;
+		gbc_spnGenerationSize.gridy = 0;
+		panel.add(spnGenerationSize, gbc_spnGenerationSize);
+
+		lblNumberOfGenerations = new JLabel("Number of Generations");
+		GridBagConstraints gbc_lblNumberOfGenerations = new GridBagConstraints();
+		gbc_lblNumberOfGenerations.anchor = GridBagConstraints.EAST;
+		gbc_lblNumberOfGenerations.insets = new Insets(0, 0, 0, 5);
+		gbc_lblNumberOfGenerations.gridx = 0;
+		gbc_lblNumberOfGenerations.gridy = 1;
+		panel.add(lblNumberOfGenerations, gbc_lblNumberOfGenerations);
+
+		spnNumberOfGenerations = new JSpinner();
+		spnNumberOfGenerations.setModel(new SpinnerNumberModel(DEFAULT_NUMBER_OF_GENERATIONS, 1, 1000000, 1));
+		GridBagConstraints gbc_spinner = new GridBagConstraints();
+		gbc_spinner.fill = GridBagConstraints.HORIZONTAL;
+		gbc_spinner.gridx = 1;
+		gbc_spinner.gridy = 1;
+		panel.add(spnNumberOfGenerations, gbc_spinner);
+		addActionHandlers();
+		EAFactory.setNumberOfGenerations(DEFAULT_NUMBER_OF_GENERATIONS);
+		EAFactory.setPopulationSize(DEFAULT_POPULATION_SIZE);
+
+	}
+
+	private void addActionHandlers() {
+		spnGenerationSize.getModel().addChangeListener(new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent arg0) {
+				EAFactory.setPopulationSize((Integer) spnGenerationSize.getValue());
+			}
+		});
+		spnNumberOfGenerations.getModel().addChangeListener(new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				EAFactory.setNumberOfGenerations((Integer) spnNumberOfGenerations.getValue());
+			}
+		});
 	}
 
 	private SpinnerNumberModel createColSpinnerModel(ChangeListener classDimensionChangeListener) {

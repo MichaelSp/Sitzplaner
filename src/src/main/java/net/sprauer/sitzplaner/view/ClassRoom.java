@@ -32,10 +32,7 @@ public class ClassRoom extends JPanel {
 
 	private ClassRoom() {
 		eventListener = new ClassRoomEventListener(this);
-		addComponentListener(eventListener);
-		addMouseWheelListener(eventListener);
-		addKeyListener(eventListener);
-		addMouseListener(eventListener);
+
 		setLayout(null);
 		blackboard = new Blackboard();
 		legende = new Legende();
@@ -95,7 +92,6 @@ public class ClassRoom extends JPanel {
 		}
 		clear();
 		this.chromosome = chromosome;
-		System.out.println("display: " + this.chromosome);
 
 		for (int i = 0; i < chromosome.size(); i++) {
 			Table table = new Table(i, this);
