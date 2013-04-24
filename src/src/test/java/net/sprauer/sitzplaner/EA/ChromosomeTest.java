@@ -2,6 +2,7 @@ package net.sprauer.sitzplaner.EA;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.awt.Point;
 
@@ -55,7 +56,8 @@ public class ChromosomeTest {
 	@Test
 	public void testGenerations() throws Exception {
 		assertEquals(null, EAFactory.currentGeneration);
-		EAFactory.nextGeneration();
+		EAFactory.nextGenerations();
+		assertNotNull(EAFactory.currentGeneration);
 		EAFactory.resetGeneration();
 		assertEquals(null, EAFactory.currentGeneration);
 	}
