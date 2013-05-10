@@ -1,5 +1,6 @@
 package net.sprauer.sitzplaner.model;
 
+import java.awt.Point;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Set;
@@ -11,6 +12,7 @@ public class Student implements Serializable {
 	private String name;
 	private int firstRowPriority;
 	private final HashMap<Integer, Integer> relations = new HashMap<Integer, Integer>();
+	private Point lockPosition = null;
 
 	public Student() {
 		firstRowPriority = 1;
@@ -68,5 +70,17 @@ public class Student implements Serializable {
 			Integer value = relations.get(key);
 			System.out.println("\t" + key + "=" + value);
 		}
+	}
+
+	public boolean isLocked() {
+		return lockPosition != null;
+	}
+
+	public Point getLockPosition() {
+		return lockPosition;
+	}
+
+	public void setLockPosition(Point lockPos) {
+		lockPosition = lockPos;
 	}
 }

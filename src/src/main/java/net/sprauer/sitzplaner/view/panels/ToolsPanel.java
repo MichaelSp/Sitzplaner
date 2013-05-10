@@ -164,6 +164,7 @@ public class ToolsPanel extends JPanel {
 			EAFactory.showChromosomeForCurrentConfig();
 		}
 	};
+	private JLabel lblDistanceToBlackboard;
 
 	private void createRadioButtonGroup() {
 		ButtonGroup g = new ButtonGroup();
@@ -741,9 +742,9 @@ public class ToolsPanel extends JPanel {
 		panel_1 = new JPanel();
 		tabSettings.addTab("Weighting", null, panel_1, null);
 		GridBagLayout gbl_panel_1 = new GridBagLayout();
-		gbl_panel_1.columnWidths = new int[] { 50, 50, 50, 50, 50, 10 };
+		gbl_panel_1.columnWidths = new int[] { 50, 50, 50, 50, 50, 0, 10 };
 		gbl_panel_1.rowHeights = new int[] { 25, 0, 0, 0, 0, 0, 0, 10 };
-		gbl_panel_1.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		gbl_panel_1.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
 		gbl_panel_1.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE };
 		panel_1.setLayout(gbl_panel_1);
 
@@ -808,7 +809,7 @@ public class ToolsPanel extends JPanel {
 		spnRight2.getModel().addChangeListener(weightingChangedListener);
 		gbc_spnRight2 = new GridBagConstraints();
 		gbc_spnRight2.fill = GridBagConstraints.HORIZONTAL;
-		gbc_spnRight2.insets = new Insets(0, 0, 5, 0);
+		gbc_spnRight2.insets = new Insets(0, 0, 5, 5);
 		gbc_spnRight2.gridx = 4;
 		gbc_spnRight2.gridy = 2;
 		panel_1.add(spnRight2, gbc_spnRight2);
@@ -868,9 +869,19 @@ public class ToolsPanel extends JPanel {
 		gbc_spnPriority.gridy = 5;
 		panel_1.add(spnPriority, gbc_spnPriority);
 
+		lblDistanceToBlackboard = new JLabel("distance to blackboard");
+		GridBagConstraints gbc_lblDistanceToBlackboard = new GridBagConstraints();
+		gbc_lblDistanceToBlackboard.anchor = GridBagConstraints.WEST;
+		gbc_lblDistanceToBlackboard.gridwidth = 3;
+		gbc_lblDistanceToBlackboard.insets = new Insets(0, 0, 5, 5);
+		gbc_lblDistanceToBlackboard.gridx = 3;
+		gbc_lblDistanceToBlackboard.gridy = 5;
+		panel_1.add(lblDistanceToBlackboard, gbc_lblDistanceToBlackboard);
+
 		pnlBlackboard = new JPanel();
 		pnlBlackboard.setBackground(Blackboard.DEFAULT_BLACKBOARD_COLOR);
 		GridBagConstraints gbc_pnlBlackboard = new GridBagConstraints();
+		gbc_pnlBlackboard.insets = new Insets(0, 0, 0, 5);
 		gbc_pnlBlackboard.anchor = GridBagConstraints.NORTH;
 		gbc_pnlBlackboard.gridwidth = 5;
 		gbc_pnlBlackboard.fill = GridBagConstraints.HORIZONTAL;

@@ -17,17 +17,15 @@ public class Chromosome implements Comparable<Chromosome>, Comparator<Chromosome
 	private static final long serialVersionUID = -3578751251444286705L;
 	private double fitness = -1;
 	Configuration configuration;
+	private Vector<StudentPosition> byIndex = new Vector<StudentPosition>();
+	private HashMap<Point, StudentPosition> positionMap = new HashMap<Point, StudentPosition>();
+	private boolean calculating;
+	public String id = UUID.randomUUID().toString();
 
 	private class StudentPosition {
 		int studentIndex;
 		Point position = new Point();
-		boolean locked;
 	}
-
-	private Vector<StudentPosition> byIndex = new Vector<Chromosome.StudentPosition>();
-	private HashMap<Point, StudentPosition> positionMap = new HashMap<Point, StudentPosition>();
-	private boolean calculating;
-	public String id = UUID.randomUUID().toString();
 
 	public Chromosome(Configuration conf) {
 		configuration = conf;
@@ -133,6 +131,9 @@ public class Chromosome implements Comparable<Chromosome>, Comparator<Chromosome
 	}
 
 	private void doSwap(int i, int j) {
+		if (DataBase.instance().getStudent(i).isLocked() || DataBase.instance().getStudent(j).isLocked()) {
+			return;
+		}
 		positionMap.put(byIndex.get(i).position, byIndex.get(j));
 		positionMap.put(byIndex.get(j).position, byIndex.get(i));
 		Collections.swap(byIndex, i, j);
@@ -152,14 +153,6 @@ public class Chromosome implements Comparable<Chromosome>, Comparator<Chromosome
 			return this;
 		}
 		return chrome;
-	}
-
-	public void lockStudent(int studentIdx, boolean locked) {
-		byIndex.get(studentIdx).locked = locked;
-	}
-
-	public boolean isLocked(int studentIdx) {
-		return byIndex.get(studentIdx).locked;
 	}
 
 	public Configuration getConfig() {

@@ -91,11 +91,11 @@ public class ClassRoom extends JPanel {
 		this.chromosome = chromosome;
 		StatisticsPanel.instance().setCurrentFitness(chromosome.getFitness());
 
-		for (int i = 0; i < chromosome.size(); i++) {
-			Table table = new Table(i, this);
+		for (int students = 0; students < chromosome.size(); students++) {
+			Table table = new Table(students, this);
 			tables.add(table);
 			add(table);
-			table.setPosition(chromosome.getPositionOf(i));
+			table.setPosition(chromosome.getPositionOf(students));
 		}
 		lblFitness.setText("" + chromosome.getFitness());
 		validate();
@@ -203,7 +203,8 @@ public class ClassRoom extends JPanel {
 	}
 
 	public void lockStudent(int studentIdx, boolean locked) {
-		chromosome.lockStudent(studentIdx, locked);
+		Point lockPos = locked ? chromosome.getPositionOf(studentIdx) : null;
+		DataBase.instance().getStudent(studentIdx).setLockPosition(lockPos);
 	}
 
 }

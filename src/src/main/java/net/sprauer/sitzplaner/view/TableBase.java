@@ -44,6 +44,7 @@ public class TableBase extends JPanel {
 			}
 		});
 
+		chkLocked.setSelected(DataBase.instance().getStudent(studentIdx).isLocked());
 		chkLocked.getModel().addActionListener(new ActionListener() {
 
 			@Override

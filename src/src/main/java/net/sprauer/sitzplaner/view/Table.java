@@ -15,8 +15,8 @@ public class Table extends TableBase {
 
 	private boolean highlighted = false;
 
-	public Table(int i, ClassRoom classRoom) {
-		super(i, classRoom);
+	public Table(int studentIndex, ClassRoom classRoom) {
+		super(studentIndex, classRoom);
 		setBackground(DEFAULT_BACKGROUND_COLOR);
 		new TableEventListener(this);
 		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
