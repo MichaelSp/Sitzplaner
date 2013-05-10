@@ -113,7 +113,6 @@ public class ToolsPanel extends JPanel {
 	private JLabel lblNewLabel;
 	private JLabel lblNewLabel_1;
 	private JLabel lblTheNewGeneration;
-	private static final int DEFAULT_NUMBER_OF_GENERATIONS = 100;
 
 	private final ChangeListener weightingChangedListener = new ChangeListener() {
 
@@ -913,7 +912,7 @@ public class ToolsPanel extends JPanel {
 		gbc_spnNumberOfGenerations.gridx = 1;
 		gbc_spnNumberOfGenerations.gridy = 2;
 		add(spnNumberOfGenerations, gbc_spnNumberOfGenerations);
-		spnNumberOfGenerations.setModel(new SpinnerNumberModel(DEFAULT_NUMBER_OF_GENERATIONS, 1, 1000000, 1));
+		spnNumberOfGenerations.setModel(new SpinnerNumberModel(30, 1, 1000000, 1));
 
 		btnNewSeatingPlan = new JButton();
 		GridBagConstraints gbc_btnNewSeatingPlan = new GridBagConstraints();
@@ -923,7 +922,7 @@ public class ToolsPanel extends JPanel {
 		gbc_btnNewSeatingPlan.gridy = 2;
 		add(btnNewSeatingPlan, gbc_btnNewSeatingPlan);
 		addActionHandlers();
-		EAFactory.setNumberOfGenerations(DEFAULT_NUMBER_OF_GENERATIONS);
+		EAFactory.setNumberOfGenerations((Integer) spnNumberOfGenerations.getValue());
 
 		createRadioButtonGroup();
 		storeAllConfigurationOptions();
@@ -941,6 +940,7 @@ public class ToolsPanel extends JPanel {
 		conf.setWeightingDiagonal((Integer) spnDiagonal.getValue());
 		conf.setWeightingPriority((Integer) spnPriority.getValue());
 		conf.setStrategiePlus(rdbPlusLambda.isSelected());
+
 	}
 
 	private SpinnerNumberModel createColSpinnerModel(ChangeListener classDimensionChangeListener) {

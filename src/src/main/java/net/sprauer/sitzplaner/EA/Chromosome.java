@@ -101,7 +101,7 @@ public class Chromosome implements Comparable<Chromosome>, Comparator<Chromosome
 
 	public List<Chromosome> invert() {
 		List<Chromosome> swapped = new ArrayList<Chromosome>();
-		for (int i = 0; i < configuration.getDescendantsUsingSwap(); i++) {
+		for (int i = 0; i < configuration.getDescendantsUsingInversion(); i++) {
 			Chromosome child = doClone().doInvert(configuration.getNumberOfInversions());
 			swapped.add(child);
 		}

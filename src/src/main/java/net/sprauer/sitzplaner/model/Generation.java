@@ -50,13 +50,8 @@ public class Generation {
 		}
 
 		for (Chromosome chromosome : parents) {
-			evolve(chromosome);
+			add(chromosome.mutate());
 		}
-	}
-
-	private void evolve(Chromosome chromosome) {
-		List<Chromosome> children = chromosome.mutate();
-		add(children);
 	}
 
 }
