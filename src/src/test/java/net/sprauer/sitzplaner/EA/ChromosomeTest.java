@@ -36,7 +36,7 @@ public class ChromosomeTest {
 
 	@Test
 	public void testCompare() {
-		ConfigManager.instance().getCurrentConfig().setNumberOfSwaps(0);
+		ConfigManager.instance().getCurrentConfig().setDescendantsUsingSwap(0);
 		List<Chromosome> children = chrom.swap();
 
 		assertEquals(0, children.size());

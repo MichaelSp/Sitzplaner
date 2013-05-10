@@ -2,6 +2,10 @@ package net.sprauer.sitzplaner.view.Commands;
 
 import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+
+import net.sprauer.sitzplaner.EA.ConfigManager;
 
 public class CommandLoadSettings extends AbstractCommand {
 
@@ -9,14 +13,24 @@ public class CommandLoadSettings extends AbstractCommand {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		String selectedFile = getFile(FileDialog.LOAD, "Load Settings", ".set");
+		String selectedFile = getFile(FileDialog.LOAD, "Load configuration", ".conf");
 		if (selectedFile != null) {
 			loadFrom(selectedFile);
 		}
 	}
 
 	private void loadFrom(String selectedFile) {
-
+		try {
+			final FileInputStream fo = new FileInputStream(selectedFile);
+			final ObjectInputStream ois = new ObjectInputStream(fo);
+			if (!ConfigManager.instance().loadConfigFrom(ois)) {
+				warningBox("Unable to load the configuration.\nToo many configurations loaded.\n"
+						+ "Please delete at least one configuration, than load this configuration again.",
+						"Sitzplaner - load configuration");
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	@Override

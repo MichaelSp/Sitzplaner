@@ -63,12 +63,10 @@ public class ToolsPanel extends JPanel {
 	private JRadioButton rdbCommaLambda;
 	private JLabel lblStrategy;
 	private JRadioButton rdbPlusLambda;
-	private JLabel lblSwap_text;
-	private JSpinner spnSwap;
-	private JLabel lblInversion_text;
-	private JSpinner spnInversion;
-	private GridBagConstraints gbc_spnInversion;
-	private GridBagConstraints gbc_spnSwap;
+	private JSpinner spnSwaps;
+	private JSpinner spnInversions;
+	private GridBagConstraints gbc_spnInversions;
+	private GridBagConstraints gbc_spnSwaps;
 	private JLabel lblStudent;
 	private JSpinner spnRight;
 	private JSpinner spnRight2;
@@ -103,6 +101,18 @@ public class ToolsPanel extends JPanel {
 	private JPanel panel_5;
 	private JLabel lblPriority;
 	private JProgressBar progressBar;
+	private JLabel lblCreate;
+	private JLabel lblDescendantsUsingSwap;
+	private JLabel lblSwapOperations;
+	private JSpinner spnNumberOfSwaps;
+	private JLabel lblCreate_1;
+	private JLabel lblDescendantsUsingInversion;
+	private JSpinner spnNumberOfInversions;
+	private JLabel lblInversionOperations;
+	private JLabel lblPerDescnendant;
+	private JLabel lblNewLabel;
+	private JLabel lblNewLabel_1;
+	private JLabel lblTheNewGeneration;
 	private static final int DEFAULT_NUMBER_OF_GENERATIONS = 100;
 
 	private final ChangeListener weightingChangedListener = new ChangeListener() {
@@ -171,8 +181,8 @@ public class ToolsPanel extends JPanel {
 	}
 
 	private void updateMutationDistribution() {
-		final int swap = (Integer) spnSwap.getValue();
-		final int inversion = (Integer) spnInversion.getValue();
+		final int swap = (Integer) spnSwaps.getValue();
+		final int inversion = (Integer) spnInversions.getValue();
 		final int numParents = (Integer) spnParents.getValue();
 		final int numDescendants = (inversion + swap) * numParents;
 		lblDescendants.setText("" + numDescendants);
@@ -183,8 +193,8 @@ public class ToolsPanel extends JPanel {
 			return;
 		}
 		final Configuration currentConfig = ConfigManager.instance().getCurrentConfig();
-		currentConfig.setNumberOfSwaps(swap);
-		currentConfig.setNumberOfInversions(inversion);
+		currentConfig.setDescendantsUsingSwap(swap);
+		currentConfig.setDescendentsUsingInversion(inversion);
 		ConfigManager.instance().currentConfigUpdated();
 	}
 
@@ -233,12 +243,14 @@ public class ToolsPanel extends JPanel {
 				spnPriority.setValue(currentConfig.getWeightingPriority());
 				spnParents.setValue(currentConfig.getParents());
 				lblParents.setText("" + currentConfig.getParents());
-				spnInversion.setValue(currentConfig.getNumberOfInversions());
-				spnSwap.setValue(currentConfig.getNumberOfSwaps());
+				spnInversions.setValue(currentConfig.getDescendantsUsingInversion());
+				spnSwaps.setValue(currentConfig.getDescendantsUsingSwap());
 				rdbPlusLambda.setSelected(currentConfig.isStrategiePlus());
 				rdbCommaLambda.setSelected(!currentConfig.isStrategiePlus());
-				lblDescendants.setText("" + currentConfig.getDescendents());
-				lblDescendants1.setText("" + currentConfig.getDescendents());
+				lblDescendants.setText("" + currentConfig.getNumberOfDescendents());
+				lblDescendants1.setText("" + currentConfig.getNumberOfDescendents());
+				spnNumberOfInversions.setValue(currentConfig.getNumberOfInversions());
+				spnNumberOfSwaps.setValue(currentConfig.getNumberOfSwaps());
 
 				blockUpdates = false;
 			}
@@ -521,108 +533,209 @@ public class ToolsPanel extends JPanel {
 		panel_2 = new JPanel();
 		tabSettings.addTab("Mutation", null, panel_2, null);
 		GridBagLayout gbl_panel_2 = new GridBagLayout();
-		gbl_panel_2.columnWidths = new int[] { 0, 50, 60 };
-		gbl_panel_2.rowHeights = new int[] { 0, 0, 20, 0 };
-		gbl_panel_2.columnWeights = new double[] { 0.0, 0.0, 0.0 };
-		gbl_panel_2.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0 };
+		gbl_panel_2.columnWidths = new int[] { 30, 0, 50, 0, 60, 0, 30 };
+		gbl_panel_2.rowHeights = new int[] { 0, 0, 0, 0, 20, 0 };
+		gbl_panel_2.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 };
+		gbl_panel_2.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 		panel_2.setLayout(gbl_panel_2);
 
-		lblParents_1 = new JLabel("Parents:");
+		lblParents_1 = new JLabel("From");
 		GridBagConstraints gbc_lblParents_1 = new GridBagConstraints();
 		gbc_lblParents_1.anchor = GridBagConstraints.EAST;
 		gbc_lblParents_1.insets = new Insets(0, 0, 5, 5);
-		gbc_lblParents_1.gridx = 0;
+		gbc_lblParents_1.gridx = 1;
 		gbc_lblParents_1.gridy = 0;
 		panel_2.add(lblParents_1, gbc_lblParents_1);
 
 		lblParents = new JLabel("0");
 		GridBagConstraints gbc_lblNumOfParents = new GridBagConstraints();
 		gbc_lblNumOfParents.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNumOfParents.gridx = 1;
+		gbc_lblNumOfParents.gridx = 2;
 		gbc_lblNumOfParents.gridy = 0;
 		panel_2.add(lblParents, gbc_lblNumOfParents);
 
-		lblDescendents = new JLabel("Descendents:");
+		lblDescendents = new JLabel("parents");
 		GridBagConstraints gbc_lblDescendents = new GridBagConstraints();
-		gbc_lblDescendents.insets = new Insets(0, 0, 5, 0);
-		gbc_lblDescendents.anchor = GridBagConstraints.EAST;
-		gbc_lblDescendents.gridx = 2;
+		gbc_lblDescendents.insets = new Insets(0, 0, 5, 5);
+		gbc_lblDescendents.anchor = GridBagConstraints.WEST;
+		gbc_lblDescendents.gridx = 3;
 		gbc_lblDescendents.gridy = 0;
 		panel_2.add(lblDescendents, gbc_lblDescendents);
 
-		lblInversion_text = new JLabel("Inversion:");
-		GridBagConstraints gbc_lblInversion_text = new GridBagConstraints();
-		gbc_lblInversion_text.anchor = GridBagConstraints.EAST;
-		gbc_lblInversion_text.insets = new Insets(0, 0, 5, 5);
-		gbc_lblInversion_text.gridx = 0;
-		gbc_lblInversion_text.gridy = 1;
-		panel_2.add(lblInversion_text, gbc_lblInversion_text);
+		lblCreate = new JLabel("create");
+		GridBagConstraints gbc_lblCreate = new GridBagConstraints();
+		gbc_lblCreate.insets = new Insets(0, 0, 5, 5);
+		gbc_lblCreate.gridx = 1;
+		gbc_lblCreate.gridy = 1;
+		panel_2.add(lblCreate, gbc_lblCreate);
 
-		spnInversion = new JSpinner();
-		spnInversion.setModel(new SpinnerNumberModel(5, 0, 100, 1));
-		spnInversion.getModel().addChangeListener(new ChangeListener() {
+		spnInversions = new JSpinner();
+		spnInversions.setModel(new SpinnerNumberModel(5, 0, 100, 1));
+		spnInversions.getModel().addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent arg0) {
+				updateMutationDistribution();
+			}
+		});
+		gbc_spnInversions = new GridBagConstraints();
+		gbc_spnInversions.fill = GridBagConstraints.HORIZONTAL;
+		gbc_spnInversions.insets = new Insets(0, 0, 5, 5);
+		gbc_spnInversions.gridx = 2;
+		gbc_spnInversions.gridy = 1;
+		panel_2.add(spnInversions, gbc_spnInversions);
+
+		lblDescendantsUsingSwap = new JLabel("<html>descendants per parent using <b>swap</b> with</html>");
+		GridBagConstraints gbc_lblDescendantsUsingSwap = new GridBagConstraints();
+		gbc_lblDescendantsUsingSwap.anchor = GridBagConstraints.WEST;
+		gbc_lblDescendantsUsingSwap.insets = new Insets(0, 0, 5, 5);
+		gbc_lblDescendantsUsingSwap.gridx = 3;
+		gbc_lblDescendantsUsingSwap.gridy = 1;
+		panel_2.add(lblDescendantsUsingSwap, gbc_lblDescendantsUsingSwap);
+
+		spnNumberOfSwaps = new JSpinner();
+		spnNumberOfSwaps.getModel().addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				ConfigManager.instance().getCurrentConfig().setNumberOfSwaps((Integer) spnNumberOfSwaps.getValue());
+				if (blockUpdates) {
+					return;
+				}
+				ConfigManager.instance().currentConfigUpdated();
+			}
+		});
+		GridBagConstraints gbc_spnNumberOfSwaps = new GridBagConstraints();
+		gbc_spnNumberOfSwaps.fill = GridBagConstraints.HORIZONTAL;
+		gbc_spnNumberOfSwaps.insets = new Insets(0, 0, 5, 5);
+		gbc_spnNumberOfSwaps.gridx = 4;
+		gbc_spnNumberOfSwaps.gridy = 1;
+		panel_2.add(spnNumberOfSwaps, gbc_spnNumberOfSwaps);
+
+		lblSwapOperations = new JLabel("swap operations,");
+		GridBagConstraints gbc_lblSwapOperations = new GridBagConstraints();
+		gbc_lblSwapOperations.anchor = GridBagConstraints.WEST;
+		gbc_lblSwapOperations.insets = new Insets(0, 0, 5, 5);
+		gbc_lblSwapOperations.gridx = 5;
+		gbc_lblSwapOperations.gridy = 1;
+		panel_2.add(lblSwapOperations, gbc_lblSwapOperations);
+
+		lblCreate_1 = new JLabel("create");
+		GridBagConstraints gbc_lblCreate_1 = new GridBagConstraints();
+		gbc_lblCreate_1.insets = new Insets(0, 0, 5, 5);
+		gbc_lblCreate_1.gridx = 1;
+		gbc_lblCreate_1.gridy = 2;
+		panel_2.add(lblCreate_1, gbc_lblCreate_1);
+
+		spnSwaps = new JSpinner();
+		spnSwaps.setModel(new SpinnerNumberModel(5, 0, 100, 1));
+		spnSwaps.getModel().addChangeListener(new ChangeListener() {
 
 			@Override
 			public void stateChanged(ChangeEvent arg0) {
 				updateMutationDistribution();
 			}
 		});
-		gbc_spnInversion = new GridBagConstraints();
-		gbc_spnInversion.fill = GridBagConstraints.HORIZONTAL;
-		gbc_spnInversion.insets = new Insets(0, 0, 5, 5);
-		gbc_spnInversion.gridx = 1;
-		gbc_spnInversion.gridy = 1;
-		panel_2.add(spnInversion, gbc_spnInversion);
+		gbc_spnSwaps = new GridBagConstraints();
+		gbc_spnSwaps.insets = new Insets(0, 0, 5, 5);
+		gbc_spnSwaps.fill = GridBagConstraints.HORIZONTAL;
+		gbc_spnSwaps.gridx = 2;
+		gbc_spnSwaps.gridy = 2;
+		panel_2.add(spnSwaps, gbc_spnSwaps);
 
-		lblInversion = new JLabel("0");
-		GridBagConstraints gbc_lblInversion = new GridBagConstraints();
-		gbc_lblInversion.insets = new Insets(0, 0, 5, 0);
-		gbc_lblInversion.gridx = 2;
-		gbc_lblInversion.gridy = 1;
-		panel_2.add(lblInversion, gbc_lblInversion);
+		lblDescendantsUsingInversion = new JLabel("<html>descendants per parent using <b>inversion</b> with</html>");
+		GridBagConstraints gbc_lblDescendantsUsingInversion = new GridBagConstraints();
+		gbc_lblDescendantsUsingInversion.anchor = GridBagConstraints.WEST;
+		gbc_lblDescendantsUsingInversion.insets = new Insets(0, 0, 5, 5);
+		gbc_lblDescendantsUsingInversion.gridx = 3;
+		gbc_lblDescendantsUsingInversion.gridy = 2;
+		panel_2.add(lblDescendantsUsingInversion, gbc_lblDescendantsUsingInversion);
 
-		lblSwap_text = new JLabel("Swap:");
-		GridBagConstraints gbc_lblSwap_text = new GridBagConstraints();
-		gbc_lblSwap_text.anchor = GridBagConstraints.EAST;
-		gbc_lblSwap_text.insets = new Insets(0, 0, 5, 5);
-		gbc_lblSwap_text.gridx = 0;
-		gbc_lblSwap_text.gridy = 2;
-		panel_2.add(lblSwap_text, gbc_lblSwap_text);
-
-		spnSwap = new JSpinner();
-		spnSwap.setModel(new SpinnerNumberModel(5, 0, 100, 1));
-		spnSwap.getModel().addChangeListener(new ChangeListener() {
-
+		spnNumberOfInversions = new JSpinner();
+		spnNumberOfInversions.getModel().addChangeListener(new ChangeListener() {
 			@Override
-			public void stateChanged(ChangeEvent arg0) {
-				updateMutationDistribution();
+			public void stateChanged(ChangeEvent e) {
+				ConfigManager.instance().getCurrentConfig().setNumberOfInversions((Integer) spnNumberOfInversions.getValue());
+				if (blockUpdates) {
+					return;
+				}
+				ConfigManager.instance().currentConfigUpdated();
 			}
 		});
-		gbc_spnSwap = new GridBagConstraints();
-		gbc_spnSwap.insets = new Insets(0, 0, 5, 5);
-		gbc_spnSwap.fill = GridBagConstraints.HORIZONTAL;
-		gbc_spnSwap.gridx = 1;
-		gbc_spnSwap.gridy = 2;
-		panel_2.add(spnSwap, gbc_spnSwap);
+		GridBagConstraints gbc_spnNumberOfInversions = new GridBagConstraints();
+		gbc_spnNumberOfInversions.fill = GridBagConstraints.HORIZONTAL;
+		gbc_spnNumberOfInversions.insets = new Insets(0, 0, 5, 5);
+		gbc_spnNumberOfInversions.gridx = 4;
+		gbc_spnNumberOfInversions.gridy = 2;
+		panel_2.add(spnNumberOfInversions, gbc_spnNumberOfInversions);
 
-		lblSwap = new JLabel("0");
-		GridBagConstraints gbc_lblSwap = new GridBagConstraints();
-		gbc_lblSwap.insets = new Insets(0, 0, 5, 0);
-		gbc_lblSwap.gridx = 2;
-		gbc_lblSwap.gridy = 2;
-		panel_2.add(lblSwap, gbc_lblSwap);
+		lblInversionOperations = new JLabel("inversion operations.");
+		GridBagConstraints gbc_lblInversionOperations = new GridBagConstraints();
+		gbc_lblInversionOperations.anchor = GridBagConstraints.WEST;
+		gbc_lblInversionOperations.insets = new Insets(0, 0, 5, 5);
+		gbc_lblInversionOperations.gridx = 5;
+		gbc_lblInversionOperations.gridy = 2;
+		panel_2.add(lblInversionOperations, gbc_lblInversionOperations);
 
-		lblTotal = new JLabel("Total:");
+		lblTotal = new JLabel("Resulting in a total of");
 		GridBagConstraints gbc_lblTotal = new GridBagConstraints();
-		gbc_lblTotal.insets = new Insets(0, 0, 0, 5);
+		gbc_lblTotal.anchor = GridBagConstraints.EAST;
+		gbc_lblTotal.gridwidth = 3;
+		gbc_lblTotal.insets = new Insets(0, 0, 5, 5);
 		gbc_lblTotal.gridx = 1;
 		gbc_lblTotal.gridy = 3;
 		panel_2.add(lblTotal, gbc_lblTotal);
 
+		lblInversion = new JLabel("0");
+		GridBagConstraints gbc_lblInversion = new GridBagConstraints();
+		gbc_lblInversion.insets = new Insets(0, 0, 5, 5);
+		gbc_lblInversion.gridx = 4;
+		gbc_lblInversion.gridy = 3;
+		panel_2.add(lblInversion, gbc_lblInversion);
+
+		lblPerDescnendant = new JLabel("<html>children using <b>swap</b></html>");
+		GridBagConstraints gbc_lblPerDescnendant = new GridBagConstraints();
+		gbc_lblPerDescnendant.anchor = GridBagConstraints.WEST;
+		gbc_lblPerDescnendant.insets = new Insets(0, 0, 5, 5);
+		gbc_lblPerDescnendant.gridx = 5;
+		gbc_lblPerDescnendant.gridy = 3;
+		panel_2.add(lblPerDescnendant, gbc_lblPerDescnendant);
+
+		lblNewLabel_1 = new JLabel("and");
+		GridBagConstraints gbc_lblNewLabel_1 = new GridBagConstraints();
+		gbc_lblNewLabel_1.anchor = GridBagConstraints.EAST;
+		gbc_lblNewLabel_1.insets = new Insets(0, 0, 5, 5);
+		gbc_lblNewLabel_1.gridx = 3;
+		gbc_lblNewLabel_1.gridy = 4;
+		panel_2.add(lblNewLabel_1, gbc_lblNewLabel_1);
+
+		lblSwap = new JLabel("0");
+		GridBagConstraints gbc_lblSwap = new GridBagConstraints();
+		gbc_lblSwap.insets = new Insets(0, 0, 5, 5);
+		gbc_lblSwap.gridx = 4;
+		gbc_lblSwap.gridy = 4;
+		panel_2.add(lblSwap, gbc_lblSwap);
+
+		lblNewLabel = new JLabel("<html>children using <b>inversion</b></html>");
+		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
+		gbc_lblNewLabel.anchor = GridBagConstraints.WEST;
+		gbc_lblNewLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_lblNewLabel.gridx = 5;
+		gbc_lblNewLabel.gridy = 4;
+		panel_2.add(lblNewLabel, gbc_lblNewLabel);
+
+		lblTheNewGeneration = new JLabel("The new generation has a population of");
+		GridBagConstraints gbc_lblTheNewGeneration = new GridBagConstraints();
+		gbc_lblTheNewGeneration.gridwidth = 2;
+		gbc_lblTheNewGeneration.anchor = GridBagConstraints.EAST;
+		gbc_lblTheNewGeneration.insets = new Insets(0, 0, 0, 5);
+		gbc_lblTheNewGeneration.gridx = 2;
+		gbc_lblTheNewGeneration.gridy = 5;
+		panel_2.add(lblTheNewGeneration, gbc_lblTheNewGeneration);
+
 		lblDescendants1 = new JLabel("10");
 		GridBagConstraints gbc_lblDescendants1 = new GridBagConstraints();
-		gbc_lblDescendants1.gridx = 2;
-		gbc_lblDescendants1.gridy = 3;
+		gbc_lblDescendants1.insets = new Insets(0, 0, 0, 5);
+		gbc_lblDescendants1.gridx = 4;
+		gbc_lblDescendants1.gridy = 5;
 		panel_2.add(lblDescendants1, gbc_lblDescendants1);
 
 		panel_1 = new JPanel();
@@ -808,8 +921,8 @@ public class ToolsPanel extends JPanel {
 
 	private void storeAllConfigurationOptions() {
 		Configuration conf = ConfigManager.instance().getCurrentConfig();
-		conf.setNumberOfInversions((Integer) spnInversion.getValue());
-		conf.setNumberOfSwaps((Integer) spnSwap.getValue());
+		conf.setDescendentsUsingInversion((Integer) spnInversions.getValue());
+		conf.setDescendantsUsingSwap((Integer) spnSwaps.getValue());
 		conf.setParents((Integer) spnParents.getValue());
 		conf.setWeightingRight((Integer) spnRight.getValue());
 		conf.setWeightingRight2((Integer) spnRight2.getValue());

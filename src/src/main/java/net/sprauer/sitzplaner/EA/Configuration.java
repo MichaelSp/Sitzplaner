@@ -5,13 +5,14 @@ import java.io.Serializable;
 
 public class Configuration implements Serializable, Cloneable {
 
-	private static final long serialVersionUID = -4387912538408349150L;
-
+	private static final long serialVersionUID = 5167515545796099132L;
 	private boolean strategiePlus = true;
 	private int parents = 10;
 
-	private int numberOfInversions = 10;
-	private int numberOfSwaps = 10;
+	private int childrenUsingInversion = 10;
+	private int childrenUsingSwap = 10;
+	private int numberOfInversions = 1;
+	private int numberOfSwaps = 5;
 
 	private int weightingRight = 5;
 	private int weightingRight2 = 1;
@@ -24,8 +25,8 @@ public class Configuration implements Serializable, Cloneable {
 	@Override
 	public String toString() {
 		String ret = strategiePlus ? "+" : ",";
-		ret = " [" + parents + ret + getDescendents() + "] ";
-		ret += " I=" + numberOfInversions + "; S=" + numberOfSwaps;
+		ret = " [" + parents + ret + getNumberOfDescendents() + "] ";
+		ret += " I=" + childrenUsingInversion + "; S=" + childrenUsingSwap;
 		ret += " W(" + weightingPriority + "," + weightingRight + "," + weightingRight2 + "," + weightingDiagonal + ","
 				+ weightingBottom + ")";
 		return ret;
@@ -37,7 +38,7 @@ public class Configuration implements Serializable, Cloneable {
 			final Configuration set = (Configuration) super.clone();
 			for (int i = 0; i < colors().length; i++) {
 				Color col = colors()[i];
-				if (!containsColor(col)) {
+				if (!ConfigManager.instance().containsColor(col)) {
 					color = col;
 					return set;
 				}
@@ -47,15 +48,6 @@ public class Configuration implements Serializable, Cloneable {
 			e.printStackTrace();
 		}
 		return null;
-	}
-
-	private boolean containsColor(Color col) {
-		for (Configuration conf : ConfigManager.instance()) {
-			if (conf.color == col) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	public static Color[] colors() {
@@ -82,21 +74,21 @@ public class Configuration implements Serializable, Cloneable {
 		ConfigManager.instance().currentConfigUpdated();
 	}
 
-	public int getNumberOfInversions() {
-		return numberOfInversions;
+	public int getDescendantsUsingInversion() {
+		return childrenUsingInversion;
 	}
 
-	public void setNumberOfInversions(int numberOfInversions) {
-		this.numberOfInversions = numberOfInversions;
+	public void setDescendentsUsingInversion(int numberOfInversions) {
+		this.childrenUsingInversion = numberOfInversions;
 		ConfigManager.instance().currentConfigUpdated();
 	}
 
-	public int getNumberOfSwaps() {
-		return numberOfSwaps;
+	public int getDescendantsUsingSwap() {
+		return childrenUsingSwap;
 	}
 
-	public void setNumberOfSwaps(int numberOfSwaps) {
-		this.numberOfSwaps = numberOfSwaps;
+	public void setDescendantsUsingSwap(int numberOfSwaps) {
+		this.childrenUsingSwap = numberOfSwaps;
 	}
 
 	public int getWeightingRight() {
@@ -140,8 +132,8 @@ public class Configuration implements Serializable, Cloneable {
 		ConfigManager.instance().currentConfigUpdated();
 	}
 
-	public int getDescendents() {
-		return ((numberOfInversions + numberOfSwaps) * parents);
+	public int getNumberOfDescendents() {
+		return ((childrenUsingInversion + childrenUsingSwap) * parents);
 	}
 
 	public int getWeightingPriority() {
@@ -150,5 +142,21 @@ public class Configuration implements Serializable, Cloneable {
 
 	public void setWeightingPriority(int weightingPriority) {
 		this.weightingPriority = weightingPriority;
+	}
+
+	public int getNumberOfInversions() {
+		return numberOfInversions;
+	}
+
+	public void setNumberOfInversions(int inversions) {
+		numberOfInversions = inversions;
+	}
+
+	public int getNumberOfSwaps() {
+		return numberOfSwaps;
+	}
+
+	public void setNumberOfSwaps(int swaps) {
+		numberOfSwaps = swaps;
 	}
 }

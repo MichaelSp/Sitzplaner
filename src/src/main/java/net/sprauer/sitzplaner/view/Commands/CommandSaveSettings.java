@@ -1,6 +1,11 @@
 package net.sprauer.sitzplaner.view.Commands;
 
+import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+
+import net.sprauer.sitzplaner.EA.ConfigManager;
 
 public class CommandSaveSettings extends AbstractCommand {
 
@@ -8,7 +13,21 @@ public class CommandSaveSettings extends AbstractCommand {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		String selectedFile = getFile(FileDialog.SAVE, "Save configuration to", ".conf");
+		if (selectedFile != null) {
+			saveTo(selectedFile);
+		}
+	}
 
+	private void saveTo(String selectedFile) {
+		try {
+			final FileOutputStream fo = new FileOutputStream(selectedFile);
+			final ObjectOutputStream oos = new ObjectOutputStream(fo);
+			ConfigManager.instance().saveConfigTo(oos);
+			oos.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	@Override

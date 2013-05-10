@@ -55,7 +55,11 @@ public abstract class AbstractCommand extends AbstractAction {
 		String file = fd.getFile();
 		if (file != null) {
 			file = fd.getDirectory() + file;
+			if (!file.endsWith(fileExtension) && mode == FileDialog.SAVE) {
+				file += fileExtension;
+			}
 		}
+
 		return file;
 	}
 

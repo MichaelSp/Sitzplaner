@@ -94,8 +94,8 @@ public class Chromosome implements Comparable<Chromosome>, Comparator<Chromosome
 
 	public List<Chromosome> swap() {
 		List<Chromosome> swapped = new ArrayList<Chromosome>();
-		for (int i = 0; i < configuration.getNumberOfSwaps(); i++) {
-			Chromosome child = doClone().doSwap(1); // TODO: Adjust this number
+		for (int i = 0; i < configuration.getDescendantsUsingSwap(); i++) {
+			Chromosome child = doClone().doSwap(configuration.getNumberOfSwaps());
 			swapped.add(child);
 		}
 		return swapped;
@@ -103,8 +103,8 @@ public class Chromosome implements Comparable<Chromosome>, Comparator<Chromosome
 
 	public List<Chromosome> invert() {
 		List<Chromosome> swapped = new ArrayList<Chromosome>();
-		for (int i = 0; i < configuration.getNumberOfSwaps(); i++) {
-			Chromosome child = doClone().doInvert(1); // TODO: Adjust this
+		for (int i = 0; i < configuration.getDescendantsUsingSwap(); i++) {
+			Chromosome child = doClone().doInvert(configuration.getNumberOfInversions());
 			swapped.add(child);
 		}
 		return swapped;
@@ -168,7 +168,7 @@ public class Chromosome implements Comparable<Chromosome>, Comparator<Chromosome
 
 	@Override
 	public int compareTo(Chromosome o) {
-		return compare(this, o);
+		return compare(o, this);
 	}
 
 }

@@ -1,5 +1,9 @@
 package net.sprauer.sitzplaner.EA;
 
+import java.awt.Color;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -11,7 +15,7 @@ public class ConfigManager extends AbstractListModel implements Iterable<Configu
 
 	private static final long serialVersionUID = -8316518150648526395L;
 	private static ConfigManager _instance;
-	private final Vector<Configuration> parameters = new Vector<Configuration>();
+	private Vector<Configuration> parameters = new Vector<Configuration>();
 	private int currentIndex = 0;
 	private boolean blockUpdates;
 	private final boolean configurationChanged = false;
@@ -44,11 +48,15 @@ public class ConfigManager extends AbstractListModel implements Iterable<Configu
 
 	public void duplicateCurrent() {
 		parameters.insertElementAt((Configuration) getCurrentConfig().clone(), currentIndex);
-		if (getSize() >= Configuration.colors().length) {
+		if (canAddConfig()) {
 			ToolsPanel.instance().setButtonNewConfigEnabled(false);
 		}
 		ToolsPanel.instance().setButtonDeleteConfigEnabled(true);
 		fireIntervalAdded(this, currentIndex + 1, currentIndex + 1);
+	}
+
+	private boolean canAddConfig() {
+		return getSize() >= Configuration.colors().length;
 	}
 
 	public void setCurrentConfigIndex(int index) {
@@ -80,13 +88,32 @@ public class ConfigManager extends AbstractListModel implements Iterable<Configu
 	public void deleteCurrentSetting() {
 		parameters.remove(currentIndex);
 		fireIntervalRemoved(this, currentIndex, currentIndex);
-		if (currentIndex == 0) {
-			// ToolsPanel.instance().selectConfiguration(currentIndex);
-		}
+
 		if (parameters.size() <= 1) {
 			ToolsPanel.instance().setButtonDeleteConfigEnabled(false);
 		}
 		ToolsPanel.instance().setButtonNewConfigEnabled(true);
 	}
 
+	public void saveConfigTo(ObjectOutputStream oos) throws IOException {
+		oos.writeObject(parameters);
+	}
+
+	@SuppressWarnings("unchecked")
+	public boolean loadConfigFrom(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+		parameters.clear();
+		parameters = (Vector<Configuration>) ois.readObject();
+		currentIndex = 0;
+		fireContentsChanged(this, 0, parameters.size());
+		return true;
+	}
+
+	public boolean containsColor(Color col) {
+		for (Configuration conf : this) {
+			if (conf.getColor() == col) {
+				return true;
+			}
+		}
+		return false;
+	}
 }
