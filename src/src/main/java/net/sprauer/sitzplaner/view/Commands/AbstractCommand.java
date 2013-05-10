@@ -40,14 +40,15 @@ public abstract class AbstractCommand extends AbstractAction {
 		return (MainWin) parent;
 	}
 
-	protected String getFile(int mode) {
+	protected String getFile(int mode, final String caption, final String fileExtension) {
 		Frame parent = getMainWin();
-		FileDialog fd = new FileDialog(parent, "Klasse speichern");
+
+		FileDialog fd = new FileDialog(parent, caption);
 		fd.setMode(mode);
 		fd.setFilenameFilter(new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
-				return name.endsWith(".cls");
+				return name.endsWith(fileExtension);
 			}
 		});
 		fd.setVisible(true);

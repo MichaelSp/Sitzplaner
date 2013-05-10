@@ -1,22 +1,39 @@
 package net.sprauer.sitzplaner.view.panels;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
+import net.sprauer.sitzplaner.EA.ConfigManager;
+import net.sprauer.sitzplaner.EA.Configuration;
 import net.sprauer.sitzplaner.EA.EAFactory;
 import net.sprauer.sitzplaner.model.DataBase;
+import net.sprauer.sitzplaner.view.Blackboard;
 import net.sprauer.sitzplaner.view.ClassRoom;
 import net.sprauer.sitzplaner.view.Commands.Factory;
 import net.sprauer.sitzplaner.view.helper.Parameter;
@@ -33,57 +50,227 @@ public class ToolsPanel extends JPanel {
 	private final JPanel pnlLoadAndSave;
 	private final JSpinner classSize;
 	private boolean blockUpdates = false;
-	private JTabbedPane tabbedPane;
+	private JTabbedPane tabClassDimensions;
 	private JLabel lblClassSize;
 	private JButton btnCreate;
 	private JPanel panel;
-	private JLabel lblGenerationSize;
-	private JSpinner spnGenerationSize;
+	private JLabel lblDescendants_text;
 	private JLabel lblNumberOfGenerations;
 	private JSpinner spnNumberOfGenerations;
+	private JTabbedPane tabSettings;
+	private JPanel panel_1;
+	private JPanel panel_2;
+	private JRadioButton rdbCommaLambda;
+	private JLabel lblStrategy;
+	private JRadioButton rdbPlusLambda;
+	private JLabel lblSwap_text;
+	private JSpinner spnSwap;
+	private JLabel lblInversion_text;
+	private JSpinner spnInversion;
+	private GridBagConstraints gbc_spnInversion;
+	private GridBagConstraints gbc_spnSwap;
+	private JLabel lblStudent;
+	private JSpinner spnRight;
+	private JSpinner spnRight2;
+	private JSpinner spnBottom;
+	private JSpinner spnDiagonal;
+	private JLabel lblTop;
+	private JLabel lblDiagonal1;
+	private JLabel lblLeft;
+	private JLabel lblLeft2;
+	private JLabel lblDiagonal2;
+	private JLabel lblDiagonal3;
+	private GridBagConstraints gbc_spnRight2;
+	private JPanel panel_3;
+	private JList lstSettings;
+	private JButton btnSettingsSave;
+	private JButton btnSettingsLoad;
+	private JButton btnSettingsNew;
+	private JButton btnSettingsDelete;
+	private JLabel lblParents_text;
+	private JSpinner spnParents;
+	private JScrollPane scrollPane;
+	private JLabel lblParents_1;
+	private JLabel lblParents;
+	private JLabel lblDescendants;
+	private JLabel lblDescendents;
+	private JLabel lblDescendants1;
+	private JLabel lblTotal;
+	private JLabel lblInversion;
+	private JLabel lblSwap;
+	private JPanel pnlBlackboard;
+	private JSpinner spnPriority;
+	private JPanel panel_5;
+	private JLabel lblPriority;
+	private JProgressBar progressBar;
 	private static final int DEFAULT_NUMBER_OF_GENERATIONS = 100;
-	private static final int DEFAULT_POPULATION_SIZE = 20;
 
-	public ToolsPanel() {
-		_instance = this;
-		ChangeListener classDimensionChangeListener = new ChangeListener() {
+	private final ChangeListener weightingChangedListener = new ChangeListener() {
+
+		@Override
+		public void stateChanged(ChangeEvent e) {
+			lblTop.setText("" + spnBottom.getValue());
+			lblLeft.setText("" + spnRight.getValue());
+			lblLeft2.setText("" + spnRight2.getValue());
+			lblDiagonal1.setText("" + spnDiagonal.getValue());
+			lblDiagonal2.setText("" + spnDiagonal.getValue());
+			lblDiagonal3.setText("" + spnDiagonal.getValue());
+			if (blockUpdates) {
+				return;
+			}
+			Configuration currentConfig = ConfigManager.instance().getCurrentConfig();
+			currentConfig.setWeightingRight((Integer) spnRight.getValue());
+			currentConfig.setWeightingRight2((Integer) spnRight2.getValue());
+			currentConfig.setWeightingBottom((Integer) spnBottom.getValue());
+			currentConfig.setWeightingDiagonal((Integer) spnDiagonal.getValue());
+			currentConfig.setWeightingPriority((Integer) spnPriority.getValue());
+			ConfigManager.instance().currentConfigUpdated();
+		}
+	};
+	private final ChangeListener classDimensionChangeListener = new ChangeListener() {
+		@Override
+		public void stateChanged(ChangeEvent e) {
+			if (blockUpdates) {
+				return;
+			}
+			Dimension dim = new Dimension((Short) numCols.getValue(), (Short) numRows.getValue());
+			ClassRoom.instance().setNewDimensions(dim);
+			Short maximum = (short) (dim.height * dim.width);
+			((SpinnerNumberModel) classSize.getModel()).setMaximum(maximum);
+			if ((Short) classSize.getValue() > maximum) {
+				classSize.setValue(maximum);
+			}
+		}
+	};
+	private final ListSelectionListener listSelectionListener = new ListSelectionListener() {
+
+		@Override
+		public void valueChanged(ListSelectionEvent arg) {
+			if (blockUpdates || arg.getValueIsAdjusting()) {
+				return;
+			}
+			final int newIndex = lstSettings.getSelectedIndex();
+			ConfigManager.instance().setCurrentConfigIndex(newIndex);
+			EAFactory.showChromosomeForCurrentConfig();
+		}
+	};
+
+	private void createRadioButtonGroup() {
+		ButtonGroup g = new ButtonGroup();
+		g.add(rdbCommaLambda);
+		g.add(rdbPlusLambda);
+		ActionListener changeListener = new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				ConfigManager.instance().getCurrentConfig().setStrategiePlus(rdbPlusLambda.isSelected());
+			}
+		};
+		rdbCommaLambda.getModel().addActionListener(changeListener);
+		rdbPlusLambda.getModel().addActionListener(changeListener);
+	}
+
+	private void updateMutationDistribution() {
+		final int swap = (Integer) spnSwap.getValue();
+		final int inversion = (Integer) spnInversion.getValue();
+		final int numParents = (Integer) spnParents.getValue();
+		final int numDescendants = (inversion + swap) * numParents;
+		lblDescendants.setText("" + numDescendants);
+		lblDescendants1.setText("" + numDescendants);
+		lblInversion.setText("" + (inversion * numParents));
+		lblSwap.setText("" + (swap * numParents));
+		if (blockUpdates) {
+			return;
+		}
+		final Configuration currentConfig = ConfigManager.instance().getCurrentConfig();
+		currentConfig.setNumberOfSwaps(swap);
+		currentConfig.setNumberOfInversions(inversion);
+		ConfigManager.instance().currentConfigUpdated();
+	}
+
+	private void addActionHandlers() {
+		spnNumberOfGenerations.getModel().addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
+				EAFactory.setNumberOfGenerations((Integer) spnNumberOfGenerations.getValue());
+			}
+		});
+
+		spnParents.getModel().addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent arg0) {
 				if (blockUpdates) {
 					return;
 				}
-				Dimension dim = new Dimension((Short) numCols.getValue(), (Short) numRows.getValue());
-				ClassRoom.instance().setNewDimensions(dim);
-				Short maximum = (short) (dim.height * dim.width);
-				((SpinnerNumberModel) classSize.getModel()).setMaximum(maximum);
-				if ((Short) classSize.getValue() > maximum) {
-					classSize.setValue(maximum);
-				}
+				final Integer value = (Integer) spnParents.getValue();
+				lblParents.setText("" + value);
+				updateMutationDistribution();
+				ConfigManager.instance().getCurrentConfig().setParents(value);
 			}
-		};
+		});
+
+		ConfigManager.instance().addListDataListener(new ListDataListener() {
+			@Override
+			public void intervalRemoved(ListDataEvent arg0) {
+			}
+
+			@Override
+			public void intervalAdded(ListDataEvent arg0) {
+			}
+
+			@Override
+			public void contentsChanged(ListDataEvent arg0) {
+				if (blockUpdates) {
+					return;
+				}
+
+				final Configuration currentConfig = ConfigManager.instance().getCurrentConfig();
+				blockUpdates = true;
+				spnBottom.setValue(currentConfig.getWeightingBottom());
+				spnDiagonal.setValue(currentConfig.getWeightingDiagonal());
+				spnRight.setValue(currentConfig.getWeightingRight());
+				spnRight2.setValue(currentConfig.getWeightingRight2());
+				spnPriority.setValue(currentConfig.getWeightingPriority());
+				spnParents.setValue(currentConfig.getParents());
+				lblParents.setText("" + currentConfig.getParents());
+				spnInversion.setValue(currentConfig.getNumberOfInversions());
+				spnSwap.setValue(currentConfig.getNumberOfSwaps());
+				rdbPlusLambda.setSelected(currentConfig.isStrategiePlus());
+				rdbCommaLambda.setSelected(!currentConfig.isStrategiePlus());
+				lblDescendants.setText("" + currentConfig.getDescendents());
+				lblDescendants1.setText("" + currentConfig.getDescendents());
+
+				blockUpdates = false;
+			}
+		});
+	}
+
+	public ToolsPanel() {
+		_instance = this;
 
 		SpinnerNumberModel rowSpinnerModel = createRowSpinnerModel(classDimensionChangeListener);
 		SpinnerNumberModel colSpinnerModel = createColSpinnerModel(classDimensionChangeListener);
 
 		GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWidths = new int[] { 310, 0, 181, 0 };
-		gridBagLayout.rowHeights = new int[] { 97, 0 };
-		gridBagLayout.columnWeights = new double[] { 0.0, 0.0, 1.0, Double.MIN_VALUE };
-		gridBagLayout.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
+		gridBagLayout.columnWidths = new int[] { 130, 80, 0, 30, 0, 0 };
+		gridBagLayout.rowHeights = new int[] { 97, 0, 0, 0 };
+		gridBagLayout.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
+		gridBagLayout.rowWeights = new double[] { 1.0, 0.0, 0.0, Double.MIN_VALUE };
 		setLayout(gridBagLayout);
 
-		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabClassDimensions = new JTabbedPane(JTabbedPane.TOP);
 		GridBagConstraints gbc_tabbedPane = new GridBagConstraints();
-		gbc_tabbedPane.insets = new Insets(0, 0, 0, 5);
 		gbc_tabbedPane.fill = GridBagConstraints.HORIZONTAL;
+		gbc_tabbedPane.gridwidth = 3;
+		gbc_tabbedPane.insets = new Insets(0, 0, 5, 5);
 		gbc_tabbedPane.gridx = 0;
 		gbc_tabbedPane.gridy = 0;
-		add(tabbedPane, gbc_tabbedPane);
+		add(tabClassDimensions, gbc_tabbedPane);
 
 		JPanel pnlClassRoomSize = new JPanel();
-		tabbedPane.addTab("Create Class", null, pnlClassRoomSize, null);
+		tabClassDimensions.addTab("Create Class", null, pnlClassRoomSize, null);
 		GridBagLayout gbl_pnlClassRoomSize = new GridBagLayout();
-		gbl_pnlClassRoomSize.columnWidths = new int[] { 30, 50, 154, 50, 29 };
+		gbl_pnlClassRoomSize.columnWidths = new int[] { 30, 50, 65, 50, 29 };
 		gbl_pnlClassRoomSize.rowHeights = new int[] { 20, 20, 0 };
 		gbl_pnlClassRoomSize.columnWeights = new double[] { 0.0, 1.0, 0.0, 1.0, Double.MIN_VALUE };
 		gbl_pnlClassRoomSize.rowWeights = new double[] { 0.0, 0.0, Double.MIN_VALUE };
@@ -157,14 +344,14 @@ public class ToolsPanel extends JPanel {
 		gbc_numCols.gridy = 1;
 		pnlClassRoomSize.add(numCols, gbc_numCols);
 
-		btnCreate = new JButton("Create");
+		btnCreate = new JButton(Factory.CommandNewClass);
 		GridBagConstraints gbc_btnCreate = new GridBagConstraints();
 		gbc_btnCreate.gridx = 3;
 		gbc_btnCreate.gridy = 1;
 		pnlClassRoomSize.add(btnCreate, gbc_btnCreate);
 
 		pnlLoadAndSave = new JPanel();
-		tabbedPane.addTab("Load & Save", null, pnlLoadAndSave, null);
+		tabClassDimensions.addTab("Load & Save", null, pnlLoadAndSave, null);
 		pnlLoadAndSave.setBorder(new TitledBorder(null, "Persistence", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		GridBagLayout gbl_pnlLoadAndSave = new GridBagLayout();
 		gbl_pnlLoadAndSave.columnWidths = new int[] { 50, 0 };
@@ -187,82 +374,449 @@ public class ToolsPanel extends JPanel {
 		gbc_btnSaveClass.gridy = 1;
 		pnlLoadAndSave.add(btnSaveClass, gbc_btnSaveClass);
 
-		btnNewSeatingPlan = new JButton();
-		GridBagConstraints gbc_btnNewSeatingPlan = new GridBagConstraints();
-		gbc_btnNewSeatingPlan.insets = new Insets(0, 0, 0, 5);
-		gbc_btnNewSeatingPlan.gridx = 1;
-		gbc_btnNewSeatingPlan.gridy = 0;
-		add(btnNewSeatingPlan, gbc_btnNewSeatingPlan);
+		tabSettings = new JTabbedPane(JTabbedPane.TOP);
+		GridBagConstraints gbc_tabbedPane_1 = new GridBagConstraints();
+		gbc_tabbedPane_1.gridheight = 3;
+		gbc_tabbedPane_1.gridwidth = 2;
+		gbc_tabbedPane_1.fill = GridBagConstraints.BOTH;
+		gbc_tabbedPane_1.gridx = 3;
+		gbc_tabbedPane_1.gridy = 0;
+		add(tabSettings, gbc_tabbedPane_1);
+
+		panel_3 = new JPanel();
+		tabSettings.addTab("Load & Save", null, panel_3, null);
+		GridBagLayout gbl_panel_3 = new GridBagLayout();
+		gbl_panel_3.columnWidths = new int[] { 143, 1, 0 };
+		gbl_panel_3.rowHeights = new int[] { 1, 0, 0, 0, 0, 0 };
+		gbl_panel_3.columnWeights = new double[] { 1.0, 0.0, Double.MIN_VALUE };
+		gbl_panel_3.rowWeights = new double[] { 1.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
+		panel_3.setLayout(gbl_panel_3);
+
+		scrollPane = new JScrollPane();
+		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
+		gbc_scrollPane.gridheight = 4;
+		gbc_scrollPane.insets = new Insets(0, 0, 0, 5);
+		gbc_scrollPane.fill = GridBagConstraints.BOTH;
+		gbc_scrollPane.gridx = 0;
+		gbc_scrollPane.gridy = 1;
+		panel_3.add(scrollPane, gbc_scrollPane);
+
+		lstSettings = new JList();
+		scrollPane.setViewportView(lstSettings);
+		lstSettings.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		lstSettings.setCellRenderer(new SettingsCellRenderer());
+		lstSettings.setModel(ConfigManager.instance());
+		lstSettings.setSelectedIndex(0);
+		lstSettings.getSelectionModel().addListSelectionListener(listSelectionListener);
+		lstSettings.setBorder(new LineBorder(new Color(0, 0, 0)));
+
+		btnSettingsLoad = new JButton(Factory.CommandLoadSettings);
+		btnSettingsLoad.setText("Load");
+		GridBagConstraints gbc_btnLoad = new GridBagConstraints();
+		gbc_btnLoad.fill = GridBagConstraints.HORIZONTAL;
+		gbc_btnLoad.insets = new Insets(0, 0, 5, 0);
+		gbc_btnLoad.gridx = 1;
+		gbc_btnLoad.gridy = 1;
+		panel_3.add(btnSettingsLoad, gbc_btnLoad);
+
+		btnSettingsSave = new JButton(Factory.CommandSaveSettings);
+		btnSettingsSave.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
+		GridBagConstraints gbc_btnSave = new GridBagConstraints();
+		gbc_btnSave.fill = GridBagConstraints.HORIZONTAL;
+		gbc_btnSave.insets = new Insets(0, 0, 5, 0);
+		gbc_btnSave.gridx = 1;
+		gbc_btnSave.gridy = 2;
+		panel_3.add(btnSettingsSave, gbc_btnSave);
+
+		btnSettingsNew = new JButton(Factory.CommandNewSettings);
+		GridBagConstraints gbc_btnSettingsNew = new GridBagConstraints();
+		gbc_btnSettingsNew.fill = GridBagConstraints.HORIZONTAL;
+		gbc_btnSettingsNew.insets = new Insets(0, 0, 5, 0);
+		gbc_btnSettingsNew.gridx = 1;
+		gbc_btnSettingsNew.gridy = 3;
+		panel_3.add(btnSettingsNew, gbc_btnSettingsNew);
+
+		btnSettingsDelete = new JButton(Factory.CommandDeleteSettings);
+		btnSettingsDelete.setEnabled(false);
+		GridBagConstraints gbc_btnSettingsDelete = new GridBagConstraints();
+		gbc_btnSettingsDelete.anchor = GridBagConstraints.NORTH;
+		gbc_btnSettingsDelete.fill = GridBagConstraints.HORIZONTAL;
+		gbc_btnSettingsDelete.gridx = 1;
+		gbc_btnSettingsDelete.gridy = 4;
+		panel_3.add(btnSettingsDelete, gbc_btnSettingsDelete);
 
 		panel = new JPanel();
-		panel.setBorder(new TitledBorder(null, "Settings", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		GridBagConstraints gbc_panel = new GridBagConstraints();
-		gbc_panel.ipady = 10;
-		gbc_panel.ipadx = 10;
-		gbc_panel.fill = GridBagConstraints.BOTH;
-		gbc_panel.gridx = 2;
-		gbc_panel.gridy = 0;
-		add(panel, gbc_panel);
+		tabSettings.addTab("Generation", null, panel, null);
 		GridBagLayout gbl_panel = new GridBagLayout();
-		gbl_panel.columnWidths = new int[] { 0, 0, 0 };
-		gbl_panel.rowHeights = new int[] { 0, 0, 0 };
-		gbl_panel.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
-		gbl_panel.rowWeights = new double[] { 0.0, 0.0, Double.MIN_VALUE };
+		gbl_panel.columnWidths = new int[] { 20, 0, 80, 0, 0 };
+		gbl_panel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0 };
+		gbl_panel.columnWeights = new double[] { 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
+		gbl_panel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		panel.setLayout(gbl_panel);
 
-		lblGenerationSize = new JLabel("Generation Size");
-		GridBagConstraints gbc_lblGenerationSize = new GridBagConstraints();
-		gbc_lblGenerationSize.anchor = GridBagConstraints.EAST;
-		gbc_lblGenerationSize.insets = new Insets(0, 0, 5, 5);
-		gbc_lblGenerationSize.gridx = 0;
-		gbc_lblGenerationSize.gridy = 0;
-		panel.add(lblGenerationSize, gbc_lblGenerationSize);
+		lblStrategy = new JLabel("Strategy:");
+		GridBagConstraints gbc_lblStrategy = new GridBagConstraints();
+		gbc_lblStrategy.gridheight = 2;
+		gbc_lblStrategy.anchor = GridBagConstraints.EAST;
+		gbc_lblStrategy.insets = new Insets(0, 0, 5, 5);
+		gbc_lblStrategy.gridx = 1;
+		gbc_lblStrategy.gridy = 0;
+		panel.add(lblStrategy, gbc_lblStrategy);
 
-		spnGenerationSize = new JSpinner();
-		spnGenerationSize.setModel(new SpinnerNumberModel(DEFAULT_POPULATION_SIZE, 1, 1000000, 1));
-		GridBagConstraints gbc_spnGenerationSize = new GridBagConstraints();
-		gbc_spnGenerationSize.fill = GridBagConstraints.HORIZONTAL;
-		gbc_spnGenerationSize.insets = new Insets(0, 0, 5, 0);
-		gbc_spnGenerationSize.gridx = 1;
-		gbc_spnGenerationSize.gridy = 0;
-		panel.add(spnGenerationSize, gbc_spnGenerationSize);
+		rdbCommaLambda = new JRadioButton("μ , λ");
+		rdbCommaLambda.setMnemonic('b');
+		GridBagConstraints gbc_rdbCommaLambda = new GridBagConstraints();
+		gbc_rdbCommaLambda.anchor = GridBagConstraints.WEST;
+		gbc_rdbCommaLambda.insets = new Insets(0, 0, 5, 5);
+		gbc_rdbCommaLambda.gridx = 2;
+		gbc_rdbCommaLambda.gridy = 0;
+		panel.add(rdbCommaLambda, gbc_rdbCommaLambda);
 
-		lblNumberOfGenerations = new JLabel("Number of Generations");
+		rdbPlusLambda = new JRadioButton("μ + λ");
+		rdbPlusLambda.setMnemonic('a');
+		rdbPlusLambda.setSelected(true);
+		GridBagConstraints gbc_rdbPlusLambda = new GridBagConstraints();
+		gbc_rdbPlusLambda.anchor = GridBagConstraints.WEST;
+		gbc_rdbPlusLambda.insets = new Insets(0, 0, 5, 5);
+		gbc_rdbPlusLambda.gridx = 2;
+		gbc_rdbPlusLambda.gridy = 1;
+		panel.add(rdbPlusLambda, gbc_rdbPlusLambda);
+
+		lblParents_text = new JLabel("Parents (µ):");
+		GridBagConstraints gbc_lblParents_text = new GridBagConstraints();
+		gbc_lblParents_text.anchor = GridBagConstraints.EAST;
+		gbc_lblParents_text.insets = new Insets(0, 0, 5, 5);
+		gbc_lblParents_text.gridx = 1;
+		gbc_lblParents_text.gridy = 2;
+		panel.add(lblParents_text, gbc_lblParents_text);
+
+		spnParents = new JSpinner();
+		spnParents.setModel(new SpinnerNumberModel(1, 1, 100, 1));
+		GridBagConstraints gbc_spnParents = new GridBagConstraints();
+		gbc_spnParents.fill = GridBagConstraints.HORIZONTAL;
+		gbc_spnParents.insets = new Insets(0, 0, 5, 5);
+		gbc_spnParents.gridx = 2;
+		gbc_spnParents.gridy = 2;
+		panel.add(spnParents, gbc_spnParents);
+
+		lblDescendants_text = new JLabel("Descendants (λ):");
+		GridBagConstraints gbc_lblDescendants_text = new GridBagConstraints();
+		gbc_lblDescendants_text.anchor = GridBagConstraints.EAST;
+		gbc_lblDescendants_text.insets = new Insets(0, 0, 5, 5);
+		gbc_lblDescendants_text.gridx = 1;
+		gbc_lblDescendants_text.gridy = 3;
+		panel.add(lblDescendants_text, gbc_lblDescendants_text);
+
+		lblDescendants = new JLabel("0");
+		GridBagConstraints gbc_lblDescendants = new GridBagConstraints();
+		gbc_lblDescendants.insets = new Insets(0, 0, 5, 5);
+		gbc_lblDescendants.gridx = 2;
+		gbc_lblDescendants.gridy = 3;
+		panel.add(lblDescendants, gbc_lblDescendants);
+
+		panel_2 = new JPanel();
+		tabSettings.addTab("Mutation", null, panel_2, null);
+		GridBagLayout gbl_panel_2 = new GridBagLayout();
+		gbl_panel_2.columnWidths = new int[] { 0, 50, 60 };
+		gbl_panel_2.rowHeights = new int[] { 0, 0, 20, 0 };
+		gbl_panel_2.columnWeights = new double[] { 0.0, 0.0, 0.0 };
+		gbl_panel_2.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0 };
+		panel_2.setLayout(gbl_panel_2);
+
+		lblParents_1 = new JLabel("Parents:");
+		GridBagConstraints gbc_lblParents_1 = new GridBagConstraints();
+		gbc_lblParents_1.anchor = GridBagConstraints.EAST;
+		gbc_lblParents_1.insets = new Insets(0, 0, 5, 5);
+		gbc_lblParents_1.gridx = 0;
+		gbc_lblParents_1.gridy = 0;
+		panel_2.add(lblParents_1, gbc_lblParents_1);
+
+		lblParents = new JLabel("0");
+		GridBagConstraints gbc_lblNumOfParents = new GridBagConstraints();
+		gbc_lblNumOfParents.insets = new Insets(0, 0, 5, 5);
+		gbc_lblNumOfParents.gridx = 1;
+		gbc_lblNumOfParents.gridy = 0;
+		panel_2.add(lblParents, gbc_lblNumOfParents);
+
+		lblDescendents = new JLabel("Descendents:");
+		GridBagConstraints gbc_lblDescendents = new GridBagConstraints();
+		gbc_lblDescendents.insets = new Insets(0, 0, 5, 0);
+		gbc_lblDescendents.anchor = GridBagConstraints.EAST;
+		gbc_lblDescendents.gridx = 2;
+		gbc_lblDescendents.gridy = 0;
+		panel_2.add(lblDescendents, gbc_lblDescendents);
+
+		lblInversion_text = new JLabel("Inversion:");
+		GridBagConstraints gbc_lblInversion_text = new GridBagConstraints();
+		gbc_lblInversion_text.anchor = GridBagConstraints.EAST;
+		gbc_lblInversion_text.insets = new Insets(0, 0, 5, 5);
+		gbc_lblInversion_text.gridx = 0;
+		gbc_lblInversion_text.gridy = 1;
+		panel_2.add(lblInversion_text, gbc_lblInversion_text);
+
+		spnInversion = new JSpinner();
+		spnInversion.setModel(new SpinnerNumberModel(5, 0, 100, 1));
+		spnInversion.getModel().addChangeListener(new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent arg0) {
+				updateMutationDistribution();
+			}
+		});
+		gbc_spnInversion = new GridBagConstraints();
+		gbc_spnInversion.fill = GridBagConstraints.HORIZONTAL;
+		gbc_spnInversion.insets = new Insets(0, 0, 5, 5);
+		gbc_spnInversion.gridx = 1;
+		gbc_spnInversion.gridy = 1;
+		panel_2.add(spnInversion, gbc_spnInversion);
+
+		lblInversion = new JLabel("0");
+		GridBagConstraints gbc_lblInversion = new GridBagConstraints();
+		gbc_lblInversion.insets = new Insets(0, 0, 5, 0);
+		gbc_lblInversion.gridx = 2;
+		gbc_lblInversion.gridy = 1;
+		panel_2.add(lblInversion, gbc_lblInversion);
+
+		lblSwap_text = new JLabel("Swap:");
+		GridBagConstraints gbc_lblSwap_text = new GridBagConstraints();
+		gbc_lblSwap_text.anchor = GridBagConstraints.EAST;
+		gbc_lblSwap_text.insets = new Insets(0, 0, 5, 5);
+		gbc_lblSwap_text.gridx = 0;
+		gbc_lblSwap_text.gridy = 2;
+		panel_2.add(lblSwap_text, gbc_lblSwap_text);
+
+		spnSwap = new JSpinner();
+		spnSwap.setModel(new SpinnerNumberModel(5, 0, 100, 1));
+		spnSwap.getModel().addChangeListener(new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent arg0) {
+				updateMutationDistribution();
+			}
+		});
+		gbc_spnSwap = new GridBagConstraints();
+		gbc_spnSwap.insets = new Insets(0, 0, 5, 5);
+		gbc_spnSwap.fill = GridBagConstraints.HORIZONTAL;
+		gbc_spnSwap.gridx = 1;
+		gbc_spnSwap.gridy = 2;
+		panel_2.add(spnSwap, gbc_spnSwap);
+
+		lblSwap = new JLabel("0");
+		GridBagConstraints gbc_lblSwap = new GridBagConstraints();
+		gbc_lblSwap.insets = new Insets(0, 0, 5, 0);
+		gbc_lblSwap.gridx = 2;
+		gbc_lblSwap.gridy = 2;
+		panel_2.add(lblSwap, gbc_lblSwap);
+
+		lblTotal = new JLabel("Total:");
+		GridBagConstraints gbc_lblTotal = new GridBagConstraints();
+		gbc_lblTotal.insets = new Insets(0, 0, 0, 5);
+		gbc_lblTotal.gridx = 1;
+		gbc_lblTotal.gridy = 3;
+		panel_2.add(lblTotal, gbc_lblTotal);
+
+		lblDescendants1 = new JLabel("10");
+		GridBagConstraints gbc_lblDescendants1 = new GridBagConstraints();
+		gbc_lblDescendants1.gridx = 2;
+		gbc_lblDescendants1.gridy = 3;
+		panel_2.add(lblDescendants1, gbc_lblDescendants1);
+
+		panel_1 = new JPanel();
+		tabSettings.addTab("Weighting", null, panel_1, null);
+		GridBagLayout gbl_panel_1 = new GridBagLayout();
+		gbl_panel_1.columnWidths = new int[] { 50, 50, 50, 50, 50, 10 };
+		gbl_panel_1.rowHeights = new int[] { 25, 0, 0, 0, 0, 0, 0, 10 };
+		gbl_panel_1.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		gbl_panel_1.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE };
+		panel_1.setLayout(gbl_panel_1);
+
+		lblDiagonal1 = new JLabel("0");
+		GridBagConstraints gbc_lblDiagonal1 = new GridBagConstraints();
+		gbc_lblDiagonal1.insets = new Insets(0, 0, 5, 5);
+		gbc_lblDiagonal1.gridx = 1;
+		gbc_lblDiagonal1.gridy = 1;
+		panel_1.add(lblDiagonal1, gbc_lblDiagonal1);
+
+		lblTop = new JLabel("0");
+		GridBagConstraints gbc_lblTop = new GridBagConstraints();
+		gbc_lblTop.fill = GridBagConstraints.HORIZONTAL;
+		gbc_lblTop.insets = new Insets(0, 0, 5, 5);
+		gbc_lblTop.gridx = 2;
+		gbc_lblTop.gridy = 1;
+		panel_1.add(lblTop, gbc_lblTop);
+
+		lblDiagonal3 = new JLabel("0");
+		GridBagConstraints gbc_lblDiagonal3 = new GridBagConstraints();
+		gbc_lblDiagonal3.anchor = GridBagConstraints.SOUTH;
+		gbc_lblDiagonal3.insets = new Insets(0, 0, 5, 5);
+		gbc_lblDiagonal3.gridx = 3;
+		gbc_lblDiagonal3.gridy = 1;
+		panel_1.add(lblDiagonal3, gbc_lblDiagonal3);
+
+		lblLeft2 = new JLabel("0");
+		GridBagConstraints gbc_lblLeft2 = new GridBagConstraints();
+		gbc_lblLeft2.anchor = GridBagConstraints.EAST;
+		gbc_lblLeft2.insets = new Insets(0, 0, 5, 5);
+		gbc_lblLeft2.gridx = 0;
+		gbc_lblLeft2.gridy = 2;
+		panel_1.add(lblLeft2, gbc_lblLeft2);
+
+		lblLeft = new JLabel("0");
+		GridBagConstraints gbc_lblLeft = new GridBagConstraints();
+		gbc_lblLeft.insets = new Insets(0, 0, 5, 5);
+		gbc_lblLeft.gridx = 1;
+		gbc_lblLeft.gridy = 2;
+		panel_1.add(lblLeft, gbc_lblLeft);
+
+		lblStudent = new JLabel("Student");
+		GridBagConstraints gbc_lblStudent = new GridBagConstraints();
+		gbc_lblStudent.fill = GridBagConstraints.HORIZONTAL;
+		gbc_lblStudent.insets = new Insets(0, 0, 5, 5);
+		gbc_lblStudent.gridx = 2;
+		gbc_lblStudent.gridy = 2;
+		panel_1.add(lblStudent, gbc_lblStudent);
+
+		spnRight = new JSpinner();
+		spnRight.setModel(new SpinnerNumberModel(5, 0, 100, 1));
+		spnRight.getModel().addChangeListener(weightingChangedListener);
+		GridBagConstraints gbc_spnRight = new GridBagConstraints();
+		gbc_spnRight.fill = GridBagConstraints.HORIZONTAL;
+		gbc_spnRight.insets = new Insets(0, 0, 5, 5);
+		gbc_spnRight.gridx = 3;
+		gbc_spnRight.gridy = 2;
+		panel_1.add(spnRight, gbc_spnRight);
+
+		spnRight2 = new JSpinner();
+		spnRight2.setModel(new SpinnerNumberModel(1, 0, 100, 1));
+		spnRight2.getModel().addChangeListener(weightingChangedListener);
+		gbc_spnRight2 = new GridBagConstraints();
+		gbc_spnRight2.fill = GridBagConstraints.HORIZONTAL;
+		gbc_spnRight2.insets = new Insets(0, 0, 5, 0);
+		gbc_spnRight2.gridx = 4;
+		gbc_spnRight2.gridy = 2;
+		panel_1.add(spnRight2, gbc_spnRight2);
+
+		lblDiagonal2 = new JLabel("0");
+		GridBagConstraints gbc_lblDiagonal2 = new GridBagConstraints();
+		gbc_lblDiagonal2.anchor = GridBagConstraints.NORTH;
+		gbc_lblDiagonal2.insets = new Insets(0, 0, 5, 5);
+		gbc_lblDiagonal2.gridx = 1;
+		gbc_lblDiagonal2.gridy = 3;
+		panel_1.add(lblDiagonal2, gbc_lblDiagonal2);
+
+		spnBottom = new JSpinner();
+		spnBottom.setModel(new SpinnerNumberModel(2, 0, 100, 1));
+		spnBottom.getModel().addChangeListener(weightingChangedListener);
+		GridBagConstraints gbc_spnBottom = new GridBagConstraints();
+		gbc_spnBottom.fill = GridBagConstraints.HORIZONTAL;
+		gbc_spnBottom.anchor = GridBagConstraints.NORTH;
+		gbc_spnBottom.insets = new Insets(0, 0, 5, 5);
+		gbc_spnBottom.gridx = 2;
+		gbc_spnBottom.gridy = 3;
+		panel_1.add(spnBottom, gbc_spnBottom);
+
+		spnDiagonal = new JSpinner();
+		spnDiagonal.setModel(new SpinnerNumberModel(1, 0, 100, 1));
+		spnDiagonal.getModel().addChangeListener(weightingChangedListener);
+		GridBagConstraints gbc_spnDiagonal = new GridBagConstraints();
+		gbc_spnDiagonal.fill = GridBagConstraints.HORIZONTAL;
+		gbc_spnDiagonal.anchor = GridBagConstraints.NORTH;
+		gbc_spnDiagonal.insets = new Insets(0, 0, 5, 5);
+		gbc_spnDiagonal.gridx = 3;
+		gbc_spnDiagonal.gridy = 3;
+		panel_1.add(spnDiagonal, gbc_spnDiagonal);
+
+		panel_5 = new JPanel();
+		GridBagConstraints gbc_panel_5 = new GridBagConstraints();
+		gbc_panel_5.insets = new Insets(0, 0, 5, 5);
+		gbc_panel_5.fill = GridBagConstraints.BOTH;
+		gbc_panel_5.gridx = 2;
+		gbc_panel_5.gridy = 4;
+		panel_1.add(panel_5, gbc_panel_5);
+
+		lblPriority = new JLabel("Priority:");
+		GridBagConstraints gbc_lblPriority = new GridBagConstraints();
+		gbc_lblPriority.insets = new Insets(0, 0, 5, 5);
+		gbc_lblPriority.gridx = 1;
+		gbc_lblPriority.gridy = 5;
+		panel_1.add(lblPriority, gbc_lblPriority);
+
+		spnPriority = new JSpinner();
+		spnPriority.setModel(new SpinnerNumberModel(5, 0, 100, 1));
+		spnPriority.getModel().addChangeListener(weightingChangedListener);
+		GridBagConstraints gbc_spnPriority = new GridBagConstraints();
+		gbc_spnPriority.fill = GridBagConstraints.HORIZONTAL;
+		gbc_spnPriority.insets = new Insets(0, 0, 5, 5);
+		gbc_spnPriority.gridx = 2;
+		gbc_spnPriority.gridy = 5;
+		panel_1.add(spnPriority, gbc_spnPriority);
+
+		pnlBlackboard = new JPanel();
+		pnlBlackboard.setBackground(Blackboard.DEFAULT_BLACKBOARD_COLOR);
+		GridBagConstraints gbc_pnlBlackboard = new GridBagConstraints();
+		gbc_pnlBlackboard.anchor = GridBagConstraints.NORTH;
+		gbc_pnlBlackboard.gridwidth = 5;
+		gbc_pnlBlackboard.fill = GridBagConstraints.HORIZONTAL;
+		gbc_pnlBlackboard.gridx = 0;
+		gbc_pnlBlackboard.gridy = 6;
+		panel_1.add(pnlBlackboard, gbc_pnlBlackboard);
+
+		progressBar = new JProgressBar();
+		progressBar.setVisible(false);
+		GridBagConstraints gbc_progressBar = new GridBagConstraints();
+		gbc_progressBar.gridwidth = 3;
+		gbc_progressBar.insets = new Insets(0, 0, 5, 5);
+		gbc_progressBar.gridx = 0;
+		gbc_progressBar.gridy = 1;
+		add(progressBar, gbc_progressBar);
+
+		lblNumberOfGenerations = new JLabel("Number of Generations:");
 		GridBagConstraints gbc_lblNumberOfGenerations = new GridBagConstraints();
 		gbc_lblNumberOfGenerations.anchor = GridBagConstraints.EAST;
 		gbc_lblNumberOfGenerations.insets = new Insets(0, 0, 0, 5);
 		gbc_lblNumberOfGenerations.gridx = 0;
-		gbc_lblNumberOfGenerations.gridy = 1;
-		panel.add(lblNumberOfGenerations, gbc_lblNumberOfGenerations);
+		gbc_lblNumberOfGenerations.gridy = 2;
+		add(lblNumberOfGenerations, gbc_lblNumberOfGenerations);
 
 		spnNumberOfGenerations = new JSpinner();
+		GridBagConstraints gbc_spnNumberOfGenerations = new GridBagConstraints();
+		gbc_spnNumberOfGenerations.fill = GridBagConstraints.HORIZONTAL;
+		gbc_spnNumberOfGenerations.insets = new Insets(0, 0, 0, 5);
+		gbc_spnNumberOfGenerations.gridx = 1;
+		gbc_spnNumberOfGenerations.gridy = 2;
+		add(spnNumberOfGenerations, gbc_spnNumberOfGenerations);
 		spnNumberOfGenerations.setModel(new SpinnerNumberModel(DEFAULT_NUMBER_OF_GENERATIONS, 1, 1000000, 1));
-		GridBagConstraints gbc_spinner = new GridBagConstraints();
-		gbc_spinner.fill = GridBagConstraints.HORIZONTAL;
-		gbc_spinner.gridx = 1;
-		gbc_spinner.gridy = 1;
-		panel.add(spnNumberOfGenerations, gbc_spinner);
+
+		btnNewSeatingPlan = new JButton();
+		GridBagConstraints gbc_btnNewSeatingPlan = new GridBagConstraints();
+		gbc_btnNewSeatingPlan.insets = new Insets(0, 0, 0, 5);
+		gbc_btnNewSeatingPlan.anchor = GridBagConstraints.WEST;
+		gbc_btnNewSeatingPlan.gridx = 2;
+		gbc_btnNewSeatingPlan.gridy = 2;
+		add(btnNewSeatingPlan, gbc_btnNewSeatingPlan);
 		addActionHandlers();
 		EAFactory.setNumberOfGenerations(DEFAULT_NUMBER_OF_GENERATIONS);
-		EAFactory.setPopulationSize(DEFAULT_POPULATION_SIZE);
 
+		createRadioButtonGroup();
+		storeAllConfigurationOptions();
+		ConfigManager.instance().setCurrentConfigIndex(0);
 	}
 
-	private void addActionHandlers() {
-		spnGenerationSize.getModel().addChangeListener(new ChangeListener() {
-
-			@Override
-			public void stateChanged(ChangeEvent arg0) {
-				EAFactory.setPopulationSize((Integer) spnGenerationSize.getValue());
-			}
-		});
-		spnNumberOfGenerations.getModel().addChangeListener(new ChangeListener() {
-
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				EAFactory.setNumberOfGenerations((Integer) spnNumberOfGenerations.getValue());
-			}
-		});
+	private void storeAllConfigurationOptions() {
+		Configuration conf = ConfigManager.instance().getCurrentConfig();
+		conf.setNumberOfInversions((Integer) spnInversion.getValue());
+		conf.setNumberOfSwaps((Integer) spnSwap.getValue());
+		conf.setParents((Integer) spnParents.getValue());
+		conf.setWeightingRight((Integer) spnRight.getValue());
+		conf.setWeightingRight2((Integer) spnRight2.getValue());
+		conf.setWeightingBottom((Integer) spnBottom.getValue());
+		conf.setWeightingDiagonal((Integer) spnDiagonal.getValue());
+		conf.setWeightingPriority((Integer) spnPriority.getValue());
+		conf.setStrategiePlus(rdbPlusLambda.isSelected());
 	}
 
 	private SpinnerNumberModel createColSpinnerModel(ChangeListener classDimensionChangeListener) {
@@ -284,6 +838,10 @@ public class ToolsPanel extends JPanel {
 		btnLoadClass.setAction(Factory.CommandLoadClass);
 		btnSaveClass.setAction(Factory.CommandSaveClass);
 		btnCreate.setAction(Factory.CommandNewClass);
+		btnSettingsLoad.setAction(Factory.CommandLoadSettings);
+		btnSettingsSave.setAction(Factory.CommandSaveSettings);
+		btnSettingsNew.setAction(Factory.CommandNewSettings);
+		btnSettingsDelete.setAction(Factory.CommandDeleteSettings);
 	}
 
 	public static ToolsPanel instance() {
@@ -303,6 +861,26 @@ public class ToolsPanel extends JPanel {
 
 	public int getClassSize() {
 		return (Short) classSize.getValue();
+	}
+
+	public void setButtonNewConfigEnabled(boolean b) {
+		btnSettingsNew.setEnabled(b);
+	}
+
+	public void setButtonDeleteConfigEnabled(boolean b) {
+		btnSettingsDelete.setEnabled(b);
+	}
+
+	public void selectConfiguration(int index) {
+		lstSettings.setSelectedIndex(index);
+	}
+
+	public void setProgress(int i, int max) {
+		final boolean progressbarVisible = i <= max - 2;
+		btnNewSeatingPlan.setEnabled(!progressbarVisible);
+		progressBar.setVisible(progressbarVisible);
+		progressBar.setMaximum(max);
+		progressBar.setValue(i);
 	}
 
 }

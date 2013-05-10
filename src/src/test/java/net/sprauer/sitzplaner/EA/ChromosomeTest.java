@@ -1,10 +1,9 @@
 package net.sprauer.sitzplaner.EA;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.awt.Point;
+import java.util.List;
 
 import net.sprauer.sitzplaner.model.DataBase;
 
@@ -18,7 +17,7 @@ public class ChromosomeTest {
 	@Before
 	public void setup() throws Exception {
 		DataBase.instance().setSize(20);
-		chrom = EAFactory.greedy();
+		chrom = EAFactory.greedy(ConfigManager.instance().getCurrentConfig());
 	}
 
 	@Test
@@ -37,11 +36,10 @@ public class ChromosomeTest {
 
 	@Test
 	public void testCompare() {
-		Chromosome newChrom = chrom.swap(0);
+		ConfigManager.instance().getCurrentConfig().setNumberOfSwaps(0);
+		List<Chromosome> children = chrom.swap();
 
-		assertNotEquals(newChrom.id, chrom.id);
-		assertEquals(0, chrom.compare(newChrom, chrom));
-		assertEquals(chrom.getFitness(), chrom.getFitness(), 0.0001);
+		assertEquals(0, children.size());
 	}
 
 	@Test
@@ -53,12 +51,4 @@ public class ChromosomeTest {
 		assertEquals(studentID, chrom.studentAt(pos));
 	}
 
-	@Test
-	public void testGenerations() throws Exception {
-		assertEquals(null, EAFactory.currentGeneration);
-		EAFactory.nextGenerations();
-		assertNotNull(EAFactory.currentGeneration);
-		EAFactory.resetGeneration();
-		assertEquals(null, EAFactory.currentGeneration);
-	}
 }

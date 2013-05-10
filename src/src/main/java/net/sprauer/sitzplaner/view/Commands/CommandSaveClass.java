@@ -14,7 +14,7 @@ public class CommandSaveClass extends AbstractCommand {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		String selectedFile = getFile(FileDialog.SAVE);
+		String selectedFile = getFile(FileDialog.SAVE, "Save Class to", ".cls");
 		if (selectedFile != null) {
 			saveTo(selectedFile);
 		}

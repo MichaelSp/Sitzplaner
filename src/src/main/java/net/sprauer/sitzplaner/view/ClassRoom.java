@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import net.sprauer.sitzplaner.EA.Chromosome;
 import net.sprauer.sitzplaner.model.DataBase;
 import net.sprauer.sitzplaner.view.helper.Parameter;
+import net.sprauer.sitzplaner.view.panels.StatisticsPanel;
 
 public class ClassRoom extends JPanel {
 
@@ -82,16 +83,13 @@ public class ClassRoom extends JPanel {
 			int y = selectionLine.ypoints[0] - (selectionLine.ypoints[0] - selectionLine.ypoints[1]) / 2;
 			g.setFont(new Font("Arial", Font.BOLD, 16));
 			g.drawString("" + selectedRelationValue, x, y);
-
 		}
 	}
 
 	public void showChromosome(Chromosome chromosome) {
-		if (this.chromosome != null && this.chromosome.getFitness() > chromosome.getFitness()) {
-			return;
-		}
 		clear();
 		this.chromosome = chromosome;
+		StatisticsPanel.instance().setCurrentFitness(chromosome.getFitness());
 
 		for (int i = 0; i < chromosome.size(); i++) {
 			Table table = new Table(i, this);
@@ -202,6 +200,10 @@ public class ClassRoom extends JPanel {
 			table.setPosition(chromosome.getPositionOf(table.student()));
 		}
 		validate();
+	}
+
+	public void lockStudent(int studentIdx, boolean locked) {
+		chromosome.lockStudent(studentIdx, locked);
 	}
 
 }

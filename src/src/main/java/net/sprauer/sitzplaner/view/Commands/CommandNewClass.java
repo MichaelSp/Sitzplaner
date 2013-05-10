@@ -10,7 +10,6 @@ public class CommandNewClass extends AbstractCommand {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-
 		int classSize = ToolsPanel.instance().getClassSize();
 		resetToNewClassSize(classSize);
 		Factory.CommandNewSeatingPlan.invoke();
@@ -18,12 +17,12 @@ public class CommandNewClass extends AbstractCommand {
 
 	@Override
 	public String getButtonCaption() {
-		return "Neue Klasse anlegen";
+		return "Create new class";
 	}
 
 	@Override
 	public String getToolTip() {
-		return "Erzeugt eine neue Klasse mit der angegebenen Größe";
+		return "Creates a new class with the given size and dimensions";
 	}
 
 }

@@ -18,7 +18,7 @@ public class CommandLoadClass extends AbstractCommand {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		String selectedFile = getFile(FileDialog.LOAD);
+		String selectedFile = getFile(FileDialog.LOAD, "Load class from file", ".cls");
 		if (selectedFile != null) {
 			loadFrom(selectedFile);
 		}
@@ -52,6 +52,6 @@ public class CommandLoadClass extends AbstractCommand {
 
 	@Override
 	public String getToolTip() {
-		return "Eine Klasse aus einer .cls-Datei laden";
+		return "Loads an existing class from a .cls-file";
 	}
 }

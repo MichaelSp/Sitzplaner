@@ -1,6 +1,5 @@
 package net.sprauer.sitzplaner.view;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GradientPaint;
@@ -10,6 +9,7 @@ import java.awt.Point;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.SpringLayout;
 
 import net.sprauer.sitzplaner.view.helper.Parameter;
 
@@ -20,14 +20,32 @@ public class Legende extends JComponent {
 	private int value = INVALID_VALUE;
 
 	public Legende() {
-		setLayout(new BorderLayout(10, 10));
+		SpringLayout springLayout = new SpringLayout();
+		setLayout(springLayout);
 
-		JLabel lblOk = new JLabel(" GOOD ");
-		add(lblOk, BorderLayout.NORTH);
+		JLabel lblGood = new JLabel("GOOD");
+		springLayout.putConstraint(SpringLayout.WEST, lblGood, 10, SpringLayout.WEST, this);
+		springLayout.putConstraint(SpringLayout.EAST, lblGood, 109, SpringLayout.WEST, this);
+		add(lblGood);
 
-		JLabel lblBad = new JLabel(" BAD ");
-		add(lblBad, BorderLayout.SOUTH);
+		JLabel lblBad = new JLabel("BAD");
+		springLayout.putConstraint(SpringLayout.WEST, lblBad, 0, SpringLayout.WEST, lblGood);
+		springLayout.putConstraint(SpringLayout.SOUTH, lblBad, -10, SpringLayout.SOUTH, this);
+		add(lblBad);
 		setLocation(0, 0);
+
+		JLabel lblFront = new JLabel("Front");
+		springLayout.putConstraint(SpringLayout.EAST, lblBad, 0, SpringLayout.EAST, lblFront);
+		springLayout.putConstraint(SpringLayout.NORTH, lblGood, 6, SpringLayout.SOUTH, lblFront);
+		springLayout.putConstraint(SpringLayout.NORTH, lblFront, 10, SpringLayout.NORTH, this);
+		springLayout.putConstraint(SpringLayout.WEST, lblFront, 10, SpringLayout.WEST, this);
+		add(lblFront);
+
+		JLabel lblBack = new JLabel("Back");
+		springLayout.putConstraint(SpringLayout.NORTH, lblBack, 6, SpringLayout.SOUTH, lblGood);
+		springLayout.putConstraint(SpringLayout.WEST, lblBack, 10, SpringLayout.WEST, this);
+		springLayout.putConstraint(SpringLayout.SOUTH, lblBack, -6, SpringLayout.NORTH, lblBad);
+		add(lblBack);
 	}
 
 	@Override
@@ -77,5 +95,4 @@ public class Legende extends JComponent {
 		value = INVALID_VALUE;
 		repaint();
 	}
-
 }

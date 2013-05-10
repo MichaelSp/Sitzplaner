@@ -28,8 +28,9 @@ public class MainWin extends JFrame {
 
 		toolsPanel = new ToolsPanel();
 		GridBagConstraints gbc_toolsPanel = new GridBagConstraints();
+		gbc_toolsPanel.fill = GridBagConstraints.HORIZONTAL;
 		gbc_toolsPanel.gridwidth = 2;
-		gbc_toolsPanel.anchor = GridBagConstraints.NORTHWEST;
+		gbc_toolsPanel.anchor = GridBagConstraints.NORTH;
 		gbc_toolsPanel.insets = new Insets(6, 6, 6, 6);
 		gbc_toolsPanel.gridx = 0;
 		gbc_toolsPanel.gridy = 0;

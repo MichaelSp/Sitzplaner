@@ -14,12 +14,12 @@ public class GenerationTest {
 	@Before
 	public void setup() throws Exception {
 		DataBase.instance().setSize(20);
-		chrom = EAFactory.greedy();
+		chrom = EAFactory.greedy(ConfigManager.instance().getCurrentConfig());
 	}
 
 	@Test
-	public void testGeneration() {
-		Generation gen = new Generation(chrom, 0);
+	public void testGeneration() throws Exception {
+		Generation gen = new Generation(ConfigManager.instance().getCurrentConfig());
 		assertEquals(gen.getBestSolution(), chrom);
 	}
 

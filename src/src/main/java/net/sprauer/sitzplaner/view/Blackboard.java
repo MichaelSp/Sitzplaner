@@ -9,7 +9,7 @@ import net.sprauer.sitzplaner.view.helper.Parameter;
 
 public class Blackboard extends JPanel {
 
-	private static final Color DEFAULT_BLACKBOARD_COLOR = new Color(0, 60, 0);
+	public static final Color DEFAULT_BLACKBOARD_COLOR = new Color(0, 60, 0);
 	private static final long serialVersionUID = -8750925029559567754L;
 
 	public Blackboard() {

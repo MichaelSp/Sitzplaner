@@ -56,7 +56,8 @@ public class Table extends TableBase {
 
 	public void setColorForRelationTo(int otherStudent) {
 		int val = DataBase.instance().relationBetween(studentIdx, otherStudent);
-		setBackground(getColorForValue(val));
+		final Color bgColor = getColorForValue(val);
+		setBackground(bgColor);
 	}
 
 	public void highlight(boolean val) {

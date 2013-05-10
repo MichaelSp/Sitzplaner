@@ -2,30 +2,43 @@ package net.sprauer.sitzplaner.EA;
 
 import java.awt.Point;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 import java.util.Vector;
 
 import net.sprauer.sitzplaner.model.DataBase;
 
-public class Chromosome implements Iterable<Point>, Comparator<Chromosome>, Serializable, Cloneable {
+public class Chromosome implements Comparable<Chromosome>, Comparator<Chromosome>, Serializable, Cloneable {
 
 	private static final long serialVersionUID = -3578751251444286705L;
 	private double fitness = -1;
-	private Vector<Point> positions = new Vector<Point>();
-	private HashMap<Point, Integer> positionMap = new HashMap<Point, Integer>();
+	Configuration configuration;
+
+	private class StudentPosition {
+		int studentIndex;
+		Point position = new Point();
+		boolean locked;
+	}
+
+	private Vector<StudentPosition> byIndex = new Vector<Chromosome.StudentPosition>();
+	private HashMap<Point, StudentPosition> positionMap = new HashMap<Point, StudentPosition>();
 	private boolean calculating;
 	public String id = UUID.randomUUID().toString();
 
-	public Chromosome() {
-		positions.setSize(DataBase.instance().getSize());
+	public Chromosome(Configuration conf) {
+		configuration = conf;
+		byIndex.setSize(DataBase.instance().getSize());
+		for (int i = 0; i < size(); i++) {
+			byIndex.set(i, new StudentPosition());
+		}
 	}
 
 	public int size() {
-		return positions.size();
+		return byIndex.size();
 	}
 
 	public double getFitness() {
@@ -42,18 +55,13 @@ public class Chromosome implements Iterable<Point>, Comparator<Chromosome>, Seri
 		return fitness;
 	}
 
-	@Override
-	public Iterator<Point> iterator() {
-		return positions.iterator();
-	}
-
 	public Point getPositionOf(int index) {
-		return positions.get(index);
+		return byIndex.get(index).position;
 	}
 
 	public void setPositionOf(int i, Point newPos) {
-		positions.set(i, newPos);
-		positionMap.put(newPos, i);
+		byIndex.get(i).position = newPos;
+		positionMap.put(newPos, byIndex.get(i));
 	}
 
 	@Override
@@ -67,7 +75,7 @@ public class Chromosome implements Iterable<Point>, Comparator<Chromosome>, Seri
 
 	public int studentAt(Point pos) {
 		if (positionMap.containsKey(pos)) {
-			return positionMap.get(pos);
+			return positionMap.get(pos).studentIndex;
 		} else {
 			return -1;
 		}
@@ -78,21 +86,56 @@ public class Chromosome implements Iterable<Point>, Comparator<Chromosome>, Seri
 		return id + "(" + fitness + ")";
 	}
 
-	public Chromosome swap(int times) {
-		Chromosome chrome = doClone();
-		chrome.fitness = -1;
-		chrome.doSwap(times);
-		return chrome;
+	public List<Chromosome> mutate() {
+		List<Chromosome> children = swap();
+		children.addAll(invert());
+		return children;
 	}
 
-	private void doSwap(int times) {
-		for (int y = 0; y < times; y++) {
-			int i = (int) (Math.random() * positions.size());
-			int j = (int) (Math.random() * positions.size());
-			positionMap.put(positions.get(i), j);
-			positionMap.put(positions.get(j), i);
-			Collections.swap(positions, i, j);
+	public List<Chromosome> swap() {
+		List<Chromosome> swapped = new ArrayList<Chromosome>();
+		for (int i = 0; i < configuration.getNumberOfSwaps(); i++) {
+			Chromosome child = doClone().doSwap(1); // TODO: Adjust this number
+			swapped.add(child);
 		}
+		return swapped;
+	}
+
+	public List<Chromosome> invert() {
+		List<Chromosome> swapped = new ArrayList<Chromosome>();
+		for (int i = 0; i < configuration.getNumberOfSwaps(); i++) {
+			Chromosome child = doClone().doInvert(1); // TODO: Adjust this
+			swapped.add(child);
+		}
+		return swapped;
+	}
+
+	private Chromosome doInvert(int times) {
+		for (int k = 0; k < times; k++) {
+			int i = (int) (Math.random() * byIndex.size());
+			int j = (int) (Math.random() * byIndex.size());
+			final int max = Math.abs(i - j);
+			int y = max;
+			for (int x = 0; (x < max && x != y); x++, y--) {
+				doSwap(x, y);
+			}
+		}
+		return this;
+	}
+
+	private Chromosome doSwap(int times) {
+		for (int y = 0; y < times; y++) {
+			int i = (int) (Math.random() * byIndex.size());
+			int j = (int) (Math.random() * byIndex.size());
+			doSwap(i, j);
+		}
+		return this;
+	}
+
+	private void doSwap(int i, int j) {
+		positionMap.put(byIndex.get(i).position, byIndex.get(j));
+		positionMap.put(byIndex.get(j).position, byIndex.get(i));
+		Collections.swap(byIndex, i, j);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -100,13 +143,32 @@ public class Chromosome implements Iterable<Point>, Comparator<Chromosome>, Seri
 		Chromosome chrome;
 		try {
 			chrome = (Chromosome) this.clone();
-			chrome.positionMap = (HashMap<Point, Integer>) positionMap.clone();
-			chrome.positions = (Vector<Point>) positions.clone();
+			chrome.positionMap = (HashMap<Point, StudentPosition>) positionMap.clone();
+			chrome.byIndex = (Vector<StudentPosition>) byIndex.clone();
 			chrome.id = UUID.randomUUID().toString();
+			chrome.fitness = -1;
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
-			return new Chromosome();
+			return this;
 		}
 		return chrome;
 	}
+
+	public void lockStudent(int studentIdx, boolean locked) {
+		byIndex.get(studentIdx).locked = locked;
+	}
+
+	public boolean isLocked(int studentIdx) {
+		return byIndex.get(studentIdx).locked;
+	}
+
+	public Configuration getConfig() {
+		return configuration;
+	}
+
+	@Override
+	public int compareTo(Chromosome o) {
+		return compare(this, o);
+	}
+
 }

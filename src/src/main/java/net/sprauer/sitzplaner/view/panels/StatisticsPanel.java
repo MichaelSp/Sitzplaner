@@ -4,10 +4,14 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import net.sprauer.sitzplaner.EA.Configuration;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -24,12 +28,14 @@ public class StatisticsPanel extends JPanel {
 	private static StatisticsPanel _instance;
 	private final JFreeChart chart;
 	private final ChartPanel chartPanel;
-	private XYSeries series;
+	private final Map<Configuration, XYSeries> seriesMap = new HashMap<Configuration, XYSeries>();
 	private final JTextField fitnessValue;
+	private final XYSeriesCollection seriesCollection;
 
 	public StatisticsPanel() {
 		_instance = this;
-		chart = createChart(createDataset());
+		seriesCollection = new XYSeriesCollection();
+		chart = createChart(seriesCollection);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 78, 0, 73, 0, 0 };
 		gridBagLayout.rowHeights = new int[] { 0, 218, 0 };
@@ -102,15 +108,16 @@ public class StatisticsPanel extends JPanel {
 
 	}
 
-	private XYSeriesCollection createDataset() {
-		XYSeriesCollection collection = new XYSeriesCollection();
-		series = new XYSeries("Fitness");
-		collection.addSeries(series);
-		return collection;
-	}
-
-	public void addFitness(double best) {
+	public void addFitness(Configuration conf, double best) {
 		fitnessValue.setText("" + best);
+		XYSeries series = seriesMap.get(conf);
+		if (series == null) {
+			int index = seriesMap.size();
+			series = new XYSeries("Fitness " + (index + 1));
+			seriesCollection.addSeries(series);
+			seriesMap.put(conf, series);
+			chart.getXYPlot().getRenderer().setSeriesPaint(index, conf.getColor());
+		}
 		if (series.getItemCount() == 0) {
 			series.add(1, 0);
 		} else {
@@ -119,8 +126,13 @@ public class StatisticsPanel extends JPanel {
 	}
 
 	public void clear() {
-		series.clear();
+		seriesMap.clear();
+		seriesCollection.removeAllSeries();
 		fitnessValue.setText("0.0");
 		validate();
+	}
+
+	public void setCurrentFitness(double fitness) {
+		fitnessValue.setText("" + fitness);
 	}
 }

@@ -10,10 +10,6 @@ import net.sprauer.sitzplaner.model.Student;
 public class OperationFitness extends EAOperation {
 
 	private Chromosome gene;
-	private static int WEIGHT_PRIORITY = 1;
-	private static int WEIGHT_RIGHT = 1;
-	private static int WEIGHT_RIGHT_RIGHT = 1;
-	private static int WEIGHT_BEHIND = 1;
 
 	@Override
 	public void invoke(Chromosome gene) throws Exception {
@@ -27,16 +23,16 @@ public class OperationFitness extends EAOperation {
 
 	private double fitnessFor(Student student, Point position) {
 		double fitness = 0;
-		fitness += WEIGHT_PRIORITY * getPriorityValueOf(student, position.y);
+		fitness += gene.getConfig().getWeightingPriority() * getPriorityValueOf(student, position.y);
 		fitness += getRelationsFor(student, position);
 		return fitness;
 	}
 
 	private double getRelationsFor(Student student, Point position) {
 		double fitness = 0;
-		fitness += WEIGHT_RIGHT * relationToRight(student, position);
-		fitness += WEIGHT_RIGHT_RIGHT * student.relationTo(gene.studentAt(rightOf(rightOf(position))));
-		fitness += WEIGHT_BEHIND * student.relationTo(gene.studentAt(under(position)));
+		fitness += gene.getConfig().getWeightingRight() * relationToRight(student, position);
+		fitness += gene.getConfig().getWeightingRight2() * student.relationTo(gene.studentAt(rightOf(rightOf(position))));
+		fitness += gene.getConfig().getWeightingBottom() * student.relationTo(gene.studentAt(under(position)));
 		return fitness;
 	}
 
