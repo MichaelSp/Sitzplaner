@@ -61,6 +61,31 @@ public class ChromosomeTest {
 
 		assertEquals(1, children.size());
 		Chromosome child = children.get(0);
+		int numberOfChangedPositions = numberOfChanges(child);
+		assertTrue("Too much or too less positions have changed. Expected 0 or 2", numberOfChangedPositions == 2
+				|| numberOfChangedPositions == 0);
+	}
+
+	@Test
+	public void testMoreDescendentsSwap() {
+		final int numberOfDescendents = 10;
+		ConfigManager.instance().getCurrentConfig().setNumberOfSwaps(1);
+		ConfigManager.instance().getCurrentConfig().setDescendantsUsingSwap(numberOfDescendents);
+		List<Chromosome> children = chrom.swap();
+
+		assertEquals(numberOfDescendents, children.size());
+		for (Chromosome child : children) {
+			int numberOfChangedPositions = numberOfChanges(child);
+			if (numberOfChangedPositions > 2) {
+				child.dump();
+			}
+			assertTrue("Too much or too less positions have changed. Expected 0 or 2, Actual " + numberOfChangedPositions,
+					numberOfChangedPositions == 2 || numberOfChangedPositions == 0);
+		}
+
+	}
+
+	private int numberOfChanges(Chromosome child) {
 		int numberOfChangedPositions = 0;
 		for (int y = Parameter.numRows - 1, i = 0; y > 0 && i < DataBase.instance().getSize(); y--) {
 			for (int x = 0; x < Parameter.numCols && i < DataBase.instance().getSize(); x++, i++) {
@@ -71,7 +96,6 @@ public class ChromosomeTest {
 				}
 			}
 		}
-		assertTrue("Too much or too less positions have changed. Expected 0 or 2", numberOfChangedPositions == 2
-				|| numberOfChangedPositions == 0);
+		return numberOfChangedPositions;
 	}
 }

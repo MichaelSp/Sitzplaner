@@ -43,15 +43,18 @@ public class Generation {
 
 	public void evolve() {
 		Collections.sort(population);
-		List<Chromosome> parents = population.subList(0, Math.min(population.size(), configuration.getParents()));
+		List<Chromosome> parents = selecteTheBestAndKillTheRest();
 		clear();
 		if (configuration.isStrategiePlus()) {
-			population.addAll(parents);
+			add(parents);
 		}
-
 		for (Chromosome chromosome : parents) {
 			add(chromosome.mutate());
 		}
 	}
 
+	private List<Chromosome> selecteTheBestAndKillTheRest() {
+		int selectionSize = Math.min(population.size(), configuration.getParents());
+		return population.subList(0, selectionSize);
+	}
 }
