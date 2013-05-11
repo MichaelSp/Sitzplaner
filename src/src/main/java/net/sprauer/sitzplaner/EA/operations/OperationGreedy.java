@@ -28,6 +28,8 @@ public class OperationGreedy extends EAOperation {
 			final Point newPos = new Point(x, y);
 			if (!positionIsAlreadyUsed(newPos)) {
 				gene.setPositionOf(student, newPos);
+			} else {
+				studentsByPriority.insertElementAt(student, 0);
 			}
 			x += 1;
 			if (x >= ClassRoom.instance().getDimensions().getWidth()) {
