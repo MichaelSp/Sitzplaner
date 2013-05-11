@@ -12,7 +12,7 @@ public class Sitzplaner {
 
 	private final MainWin mainWin;
 
-	public Sitzplaner(String defaultFile) {
+	public Sitzplaner(String defaultConfigurationFile, String defaultClassFile) {
 
 		setStyle();
 
@@ -20,10 +20,15 @@ public class Sitzplaner {
 		Factory.init();
 		mainWin.initView();
 
-		if (fileExists(defaultFile)) {
-			Factory.CommandLoadClass.loadFrom(defaultFile);
+		if (fileExists(defaultClassFile)) {
+			Factory.CommandLoadClass.loadFrom(defaultClassFile);
 		} else {
-			System.err.println("Unable to load: " + defaultFile);
+			System.err.println("Unable to load: " + defaultClassFile);
+		}
+		if (fileExists(defaultConfigurationFile)) {
+			Factory.CommandLoadSettings.loadFrom(defaultConfigurationFile);
+		} else {
+			System.err.println("Unable to load: " + defaultConfigurationFile);
 		}
 	}
 
@@ -43,7 +48,9 @@ public class Sitzplaner {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				new Sitzplaner((args.length >= 1) ? args[0] : "DEFAULT.cls");
+				final String configFile = (args.length >= 1) ? args[0] : "DEFAULT.conf";
+				final String classFile = (args.length >= 2) ? args[1] : "DEFAULT.cls";
+				new Sitzplaner(configFile, classFile);
 			}
 		});
 	}

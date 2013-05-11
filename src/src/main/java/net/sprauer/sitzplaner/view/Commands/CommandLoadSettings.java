@@ -19,7 +19,7 @@ public class CommandLoadSettings extends AbstractCommand {
 		}
 	}
 
-	private void loadFrom(String selectedFile) {
+	public void loadFrom(String selectedFile) {
 		try {
 			final FileInputStream fo = new FileInputStream(selectedFile);
 			final ObjectInputStream ois = new ObjectInputStream(fo);

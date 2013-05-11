@@ -103,7 +103,11 @@ public class ConfigManager extends AbstractListModel implements Iterable<Configu
 	public boolean loadConfigFrom(ObjectInputStream ois) throws IOException, ClassNotFoundException {
 		parameters.clear();
 		parameters = (Vector<Configuration>) ois.readObject();
+		for (int i = 0; i < parameters.size(); i++) {
+			parameters.get(i).setColor(Configuration.colors()[i]);
+		}
 		currentIndex = 0;
+		ToolsPanel.instance().setButtonDeleteConfigEnabled(parameters.size() > 1);
 		fireContentsChanged(this, 0, parameters.size());
 		return true;
 	}

@@ -80,7 +80,6 @@ public class Configuration implements Serializable, Cloneable {
 
 	public void setDescendentsUsingInversion(int numberOfInversions) {
 		this.childrenUsingInversion = numberOfInversions;
-		ConfigManager.instance().currentConfigUpdated();
 	}
 
 	public int getDescendantsUsingSwap() {
