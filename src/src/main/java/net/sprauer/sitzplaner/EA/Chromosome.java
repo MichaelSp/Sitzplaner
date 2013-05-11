@@ -11,6 +11,7 @@ import java.util.UUID;
 import java.util.Vector;
 
 import net.sprauer.sitzplaner.model.DataBase;
+import net.sprauer.sitzplaner.view.helper.Parameter;
 
 public class Chromosome implements Comparable<Chromosome>, Comparator<Chromosome>, Serializable, Cloneable {
 
@@ -23,6 +24,10 @@ public class Chromosome implements Comparable<Chromosome>, Comparator<Chromosome
 	public String id = UUID.randomUUID().toString();
 
 	private class StudentPosition {
+		public StudentPosition(int i) {
+			studentIndex = i;
+		}
+
 		int studentIndex;
 		Point position = new Point();
 	}
@@ -31,7 +36,7 @@ public class Chromosome implements Comparable<Chromosome>, Comparator<Chromosome
 		configuration = conf;
 		byIndex.setSize(DataBase.instance().getSize());
 		for (int i = 0; i < size(); i++) {
-			byIndex.set(i, new StudentPosition());
+			byIndex.set(i, new StudentPosition(i));
 		}
 	}
 
@@ -110,12 +115,11 @@ public class Chromosome implements Comparable<Chromosome>, Comparator<Chromosome
 
 	private Chromosome doInvert(int times) {
 		for (int k = 0; k < times; k++) {
-			int i = (int) (Math.random() * byIndex.size());
-			int j = (int) (Math.random() * byIndex.size());
-			final int max = Math.abs(i - j);
-			int y = max;
-			for (int x = 0; (x < max && x != y); x++, y--) {
-				doSwap(x, y);
+			int row = (int) (Math.random() * Parameter.numRows);
+			for (int col1 = 0, col2 = Parameter.numCols; col1 < Parameter.numCols; col1++, col2--) {
+				int i = positionMap.get(new Point(col1, row)).studentIndex;
+				int j = positionMap.get(new Point(col2, row)).studentIndex;
+				doSwap(i, j);
 			}
 		}
 		return this;
@@ -131,11 +135,15 @@ public class Chromosome implements Comparable<Chromosome>, Comparator<Chromosome
 	}
 
 	private void doSwap(int i, int j) {
+		if (i == j) {
+			return;
+		}
 		if (DataBase.instance().getStudent(i).isLocked() || DataBase.instance().getStudent(j).isLocked()) {
 			return;
 		}
-		positionMap.put(byIndex.get(i).position, byIndex.get(j));
-		positionMap.put(byIndex.get(j).position, byIndex.get(i));
+		final int studI = byIndex.get(i).studentIndex;
+		byIndex.get(i).studentIndex = j;
+		byIndex.get(j).studentIndex = studI;
 		Collections.swap(byIndex, i, j);
 	}
 
@@ -164,4 +172,23 @@ public class Chromosome implements Comparable<Chromosome>, Comparator<Chromosome
 		return compare(o, this);
 	}
 
+	public void dump() {
+		System.out.println("----------------------------(" + Parameter.numCols + "*" + Parameter.numRows + ")");
+		for (int y = 0; y < Parameter.numRows; y++) {
+			for (int x = 0; x < Parameter.numCols; x++) {
+				final Point pos = new Point(x, y);
+				final StudentPosition studentPosition = positionMap.get(pos);
+				if (studentPosition == null) {
+					System.out.print("|  ");
+					continue;
+				}
+				if (!studentPosition.position.equals(pos)) {
+					System.out.print("|X ");
+				} else {
+					System.out.print("|" + String.format("%02d", studentPosition.studentIndex));
+				}
+			}
+			System.out.println("|");
+		}
+	}
 }

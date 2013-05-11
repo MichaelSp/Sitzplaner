@@ -5,9 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Vector;
 
-import javax.swing.AbstractListModel;
-
-public class DataBase extends AbstractListModel {
+public class DataBase {
 
 	private static final long serialVersionUID = -6092782546638521212L;
 	private Vector<Student> students = new Vector<Student>();
@@ -17,14 +15,12 @@ public class DataBase extends AbstractListModel {
 		return _instance;
 	}
 
-	@Override
 	public int getSize() {
 		return students.size();
 	}
 
 	public void setName(int index, String name) {
 		students.get(index).setName(name);
-		fireContentsChanged(this, index, index);
 	}
 
 	public String getName(int index) {
@@ -58,9 +54,6 @@ public class DataBase extends AbstractListModel {
 	@SuppressWarnings("unchecked")
 	public void restoreFrom(ObjectInputStream ois) throws IOException, ClassNotFoundException {
 		students = (Vector<Student>) ois.readObject();
-		if (!isEmpty()) {
-			fireIntervalAdded(this, 0, getSize());
-		}
 	}
 
 	boolean isEmpty() {
@@ -86,20 +79,13 @@ public class DataBase extends AbstractListModel {
 			getStudent(i).setRelationTo(lastStudent, null);
 		}
 		students.remove(lastStudent);
-		fireIntervalRemoved(this, lastStudent, getSize());
 	}
 
 	private void addStudent(Student student) {
 		students.add(student);
-		fireIntervalAdded(this, getSize() - 1, getSize());
 	}
 
 	private DataBase() {
-	}
-
-	@Override
-	public Object getElementAt(int index) {
-		return getStudent(index);
 	}
 
 	public void clear() {
