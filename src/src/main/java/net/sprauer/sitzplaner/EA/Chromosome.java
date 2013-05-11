@@ -16,15 +16,15 @@ import net.sprauer.sitzplaner.view.helper.Parameter;
 
 public class Chromosome implements Comparable<Chromosome>, Comparator<Chromosome>, Serializable {
 
-	private static final long serialVersionUID = -3578751251444286705L;
-	private double fitness = -1;
+	static final long serialVersionUID = -3578751251444286705L;
+	double fitness = -1;
 	Configuration configuration;
-	private final Vector<StudentPosition> byIndex = new Vector<StudentPosition>();
-	private final HashMap<Point, StudentPosition> positionMap = new HashMap<Point, StudentPosition>();
-	private boolean calculating;
+	final Vector<StudentPosition> byIndex = new Vector<StudentPosition>();
+	final HashMap<Point, StudentPosition> positionMap = new HashMap<Point, StudentPosition>();
+	boolean calculating;
 	public String id = UUID.randomUUID().toString();
 
-	private class StudentPosition implements Serializable {
+	class StudentPosition implements Serializable {
 		private static final long serialVersionUID = 7570524909720881283L;
 
 		public StudentPosition(int i) {
@@ -172,9 +172,6 @@ public class Chromosome implements Comparable<Chromosome>, Comparator<Chromosome
 		if (DataBase.instance().getStudent(i).isLocked() || DataBase.instance().getStudent(j).isLocked()) {
 			return;
 		}
-		// System.out.println("Do SWAP " + this + " : " + byIndex.get(i) + "==>"
-		// + byIndex.get(j));
-
 		final int studI = byIndex.get(i).studentIndex;
 		byIndex.get(i).studentIndex = j;
 		byIndex.get(j).studentIndex = studI;
@@ -209,7 +206,9 @@ public class Chromosome implements Comparable<Chromosome>, Comparator<Chromosome
 					System.out.print("|  ");
 					continue;
 				}
-				if (!studentPosition.position.equals(pos)) {
+				if (!studentPosition.position.equals(pos)
+						|| byIndex.get(studentPosition.studentIndex).studentIndex != studentPosition.studentIndex
+						|| !byIndex.get(studentPosition.studentIndex).position.equals(pos)) {
 					System.out.print("|X ");
 				} else {
 					System.out.print("|" + String.format("%02d", studentPosition.studentIndex));
@@ -218,4 +217,5 @@ public class Chromosome implements Comparable<Chromosome>, Comparator<Chromosome
 			System.out.println("|");
 		}
 	}
+
 }
