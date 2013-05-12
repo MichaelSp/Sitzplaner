@@ -97,28 +97,28 @@ public class Chromosome implements Comparable<Chromosome>, Comparator<Chromosome
 		return id + "(" + fitness + ")";
 	}
 
-	public List<Chromosome> mutate() {
-		List<Chromosome> children = swap();
-		children.addAll(invert());
-		return children;
-	}
-
 	public List<Chromosome> swap() {
 		List<Chromosome> swapped = new ArrayList<Chromosome>();
 		for (int i = 0; i < configuration.getDescendantsUsingSwap(); i++) {
-			Chromosome child = doClone().doSwap(configuration.getNumberOfSwaps());
-			swapped.add(child);
+			swapped.add(doOneSwap());
 		}
 		return swapped;
+	}
+
+	public Chromosome doOneSwap() {
+		return doClone().doSwap(configuration.getNumberOfSwaps());
 	}
 
 	public List<Chromosome> invert() {
 		List<Chromosome> swapped = new ArrayList<Chromosome>();
 		for (int i = 0; i < configuration.getDescendantsUsingInversion(); i++) {
-			Chromosome child = doClone().doInvert(configuration.getNumberOfInversions());
-			swapped.add(child);
+			swapped.add(doOneInvert());
 		}
 		return swapped;
+	}
+
+	public Chromosome doOneInvert() {
+		return doClone().doInvert(configuration.getNumberOfInversions());
 	}
 
 	private Chromosome doInvert(int times) {

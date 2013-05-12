@@ -585,7 +585,7 @@ public class ToolsPanel extends JPanel {
 		spnTournamentSize = new JSpinner();
 		spnTournamentSize.setEnabled(false);
 		spnTournamentSize.setToolTipText("Pick the ONE best out of this many randomly selected parents.");
-		spnTournamentSize.setModel(new SpinnerNumberModel(5, 0, 10000, 1));
+		spnTournamentSize.setModel(new SpinnerNumberModel(5, 1, 10000, 1));
 		GridBagConstraints gbc_spnTournamentSize = new GridBagConstraints();
 		gbc_spnTournamentSize.fill = GridBagConstraints.HORIZONTAL;
 		gbc_spnTournamentSize.gridx = 1;
