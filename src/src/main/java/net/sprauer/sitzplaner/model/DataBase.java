@@ -7,7 +7,6 @@ import java.util.Vector;
 
 public class DataBase {
 
-	private static final long serialVersionUID = -6092782546638521212L;
 	private Vector<Student> students = new Vector<Student>();
 	private static DataBase _instance = new DataBase();
 

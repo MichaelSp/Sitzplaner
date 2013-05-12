@@ -32,6 +32,7 @@ import javax.swing.event.ListSelectionListener;
 import net.sprauer.sitzplaner.EA.ConfigManager;
 import net.sprauer.sitzplaner.EA.Configuration;
 import net.sprauer.sitzplaner.EA.EAFactory;
+import net.sprauer.sitzplaner.EA.Strategy;
 import net.sprauer.sitzplaner.model.DataBase;
 import net.sprauer.sitzplaner.view.Blackboard;
 import net.sprauer.sitzplaner.view.ClassRoom;
@@ -113,6 +114,9 @@ public class ToolsPanel extends JPanel {
 	private JLabel lblNewLabel;
 	private JLabel lblNewLabel_1;
 	private JLabel lblTheNewGeneration;
+	private JLabel lblDistanceToBlackboard;
+	private JRadioButton rdbRank;
+	private JRadioButton rdbTournament;
 
 	private final ChangeListener weightingChangedListener = new ChangeListener() {
 
@@ -163,21 +167,62 @@ public class ToolsPanel extends JPanel {
 			EAFactory.showChromosomeForCurrentConfig();
 		}
 	};
-	private JLabel lblDistanceToBlackboard;
+	private JRadioButton rdbNormal;
+	private JSpinner spnTournamentSize;
+	private JPanel panel_4;
 
 	private void createRadioButtonGroup() {
 		ButtonGroup g = new ButtonGroup();
+		ButtonGroup g1 = new ButtonGroup();
 		g.add(rdbCommaLambda);
 		g.add(rdbPlusLambda);
+		g1.add(rdbNormal);
+		g1.add(rdbRank);
+		g1.add(rdbTournament);
 		ActionListener changeListener = new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				spnTournamentSize.setEnabled(rdbTournament.isSelected());
+				if (blockUpdates) {
+					return;
+				}
+				Strategy strategy = getStrategy();
 				ConfigManager.instance().getCurrentConfig().setStrategiePlus(rdbPlusLambda.isSelected());
+				ConfigManager.instance().getCurrentConfig().setTournamentSize((Integer) spnTournamentSize.getValue());
+				ConfigManager.instance().getCurrentConfig().setStrategy(strategy);
+				ConfigManager.instance().currentConfigUpdated();
 			}
+
 		};
 		rdbCommaLambda.getModel().addActionListener(changeListener);
 		rdbPlusLambda.getModel().addActionListener(changeListener);
+		rdbNormal.getModel().addActionListener(changeListener);
+		rdbRank.getModel().addActionListener(changeListener);
+		rdbTournament.getModel().addActionListener(changeListener);
+		spnTournamentSize.getModel().addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if (blockUpdates) {
+					return;
+				}
+				final Configuration currentConfig = ConfigManager.instance().getCurrentConfig();
+				currentConfig.setTournamentSize((Integer) spnTournamentSize.getValue());
+				ConfigManager.instance().currentConfigUpdated();
+			}
+		});
+	}
+
+	private Strategy getStrategy() {
+		Strategy strategy = Strategy.Normal;
+		if (rdbNormal.isSelected()) {
+			strategy = Strategy.Normal;
+		} else if (rdbRank.isSelected()) {
+			strategy = Strategy.Rank;
+		} else if (rdbTournament.isSelected()) {
+			strategy = Strategy.Tournament;
+		}
+		return strategy;
 	}
 
 	private void updateMutationDistribution() {
@@ -247,10 +292,15 @@ public class ToolsPanel extends JPanel {
 				spnSwap.setValue(currentConfig.getDescendantsUsingSwap());
 				rdbPlusLambda.setSelected(currentConfig.isStrategiePlus());
 				rdbCommaLambda.setSelected(!currentConfig.isStrategiePlus());
+				rdbNormal.setSelected(currentConfig.getStrategy() == Strategy.Normal);
+				rdbRank.setSelected(currentConfig.getStrategy() == Strategy.Rank);
+				rdbTournament.setSelected(currentConfig.getStrategy() == Strategy.Tournament);
+				spnTournamentSize.setValue(currentConfig.getTournamentSize());
 				lblDescendants.setText("" + currentConfig.getNumberOfDescendents());
 				lblDescendants1.setText("" + currentConfig.getNumberOfDescendents());
 				spnNumberOfInversions.setValue(currentConfig.getNumberOfInversions());
 				spnNumberOfSwaps.setValue(currentConfig.getNumberOfSwaps());
+				spnTournamentSize.setEnabled(rdbTournament.isSelected());
 
 				blockUpdates = false;
 			}
@@ -464,10 +514,10 @@ public class ToolsPanel extends JPanel {
 		panel = new JPanel();
 		tabSettings.addTab("Generation", null, panel, null);
 		GridBagLayout gbl_panel = new GridBagLayout();
-		gbl_panel.columnWidths = new int[] { 20, 0, 80, 0, 0 };
+		gbl_panel.columnWidths = new int[] { 20, 0, 80, 0, 0, 0 };
 		gbl_panel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0 };
-		gbl_panel.columnWeights = new double[] { 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
-		gbl_panel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		gbl_panel.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
+		gbl_panel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE };
 		panel.setLayout(gbl_panel);
 
 		lblStrategy = new JLabel("Strategy:");
@@ -487,6 +537,60 @@ public class ToolsPanel extends JPanel {
 		gbc_rdbCommaLambda.gridx = 2;
 		gbc_rdbCommaLambda.gridy = 0;
 		panel.add(rdbCommaLambda, gbc_rdbCommaLambda);
+
+		panel_4 = new JPanel();
+		panel_4.setBorder(new TitledBorder(null, "Additional Selection Methods", TitledBorder.LEADING, TitledBorder.TOP, null,
+				null));
+		GridBagConstraints gbc_panel_4 = new GridBagConstraints();
+		gbc_panel_4.insets = new Insets(0, 0, 5, 0);
+		gbc_panel_4.gridheight = 4;
+		gbc_panel_4.fill = GridBagConstraints.BOTH;
+		gbc_panel_4.gridx = 4;
+		gbc_panel_4.gridy = 0;
+		panel.add(panel_4, gbc_panel_4);
+		GridBagLayout gbl_panel_4 = new GridBagLayout();
+		gbl_panel_4.columnWidths = new int[] { 59, 49, 0 };
+		gbl_panel_4.rowHeights = new int[] { 23, 14, 0, 0 };
+		gbl_panel_4.columnWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
+		gbl_panel_4.rowWeights = new double[] { 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		panel_4.setLayout(gbl_panel_4);
+
+		rdbNormal = new JRadioButton("Normal");
+		rdbNormal.setToolTipText("Every parent may create the same amount of descendants");
+		rdbNormal.setSelected(true);
+		GridBagConstraints gbc_rdbNormal = new GridBagConstraints();
+		gbc_rdbNormal.anchor = GridBagConstraints.NORTHWEST;
+		gbc_rdbNormal.insets = new Insets(0, 0, 5, 5);
+		gbc_rdbNormal.gridx = 0;
+		gbc_rdbNormal.gridy = 0;
+		panel_4.add(rdbNormal, gbc_rdbNormal);
+
+		rdbRank = new JRadioButton("Rank");
+		rdbRank.setToolTipText("The best may create the most children (linear).");
+		GridBagConstraints gbc_rdbRank = new GridBagConstraints();
+		gbc_rdbRank.anchor = GridBagConstraints.NORTHWEST;
+		gbc_rdbRank.insets = new Insets(0, 0, 5, 5);
+		gbc_rdbRank.gridx = 0;
+		gbc_rdbRank.gridy = 1;
+		panel_4.add(rdbRank, gbc_rdbRank);
+
+		rdbTournament = new JRadioButton("Tournament");
+		GridBagConstraints gbc_rdbTournament = new GridBagConstraints();
+		gbc_rdbTournament.anchor = GridBagConstraints.NORTHWEST;
+		gbc_rdbTournament.insets = new Insets(0, 0, 0, 5);
+		gbc_rdbTournament.gridx = 0;
+		gbc_rdbTournament.gridy = 2;
+		panel_4.add(rdbTournament, gbc_rdbTournament);
+
+		spnTournamentSize = new JSpinner();
+		spnTournamentSize.setEnabled(false);
+		spnTournamentSize.setToolTipText("Pick the ONE best out of this many randomly selected parents.");
+		spnTournamentSize.setModel(new SpinnerNumberModel(5, 0, 10000, 1));
+		GridBagConstraints gbc_spnTournamentSize = new GridBagConstraints();
+		gbc_spnTournamentSize.fill = GridBagConstraints.HORIZONTAL;
+		gbc_spnTournamentSize.gridx = 1;
+		gbc_spnTournamentSize.gridy = 2;
+		panel_4.add(spnTournamentSize, gbc_spnTournamentSize);
 
 		rdbPlusLambda = new JRadioButton("μ + λ");
 		rdbPlusLambda.setMnemonic('a');
@@ -517,7 +621,7 @@ public class ToolsPanel extends JPanel {
 
 		lblDescendants_text = new JLabel("Descendants (λ):");
 		GridBagConstraints gbc_lblDescendants_text = new GridBagConstraints();
-		gbc_lblDescendants_text.anchor = GridBagConstraints.EAST;
+		gbc_lblDescendants_text.anchor = GridBagConstraints.NORTHEAST;
 		gbc_lblDescendants_text.insets = new Insets(0, 0, 5, 5);
 		gbc_lblDescendants_text.gridx = 1;
 		gbc_lblDescendants_text.gridy = 3;
@@ -525,6 +629,7 @@ public class ToolsPanel extends JPanel {
 
 		lblDescendants = new JLabel("0");
 		GridBagConstraints gbc_lblDescendants = new GridBagConstraints();
+		gbc_lblDescendants.anchor = GridBagConstraints.NORTH;
 		gbc_lblDescendants.insets = new Insets(0, 0, 5, 5);
 		gbc_lblDescendants.gridx = 2;
 		gbc_lblDescendants.gridy = 3;
@@ -939,8 +1044,7 @@ public class ToolsPanel extends JPanel {
 		conf.setWeightingBottom((Integer) spnBottom.getValue());
 		conf.setWeightingDiagonal((Integer) spnDiagonal.getValue());
 		conf.setWeightingPriority((Integer) spnPriority.getValue());
-		conf.setStrategiePlus(rdbPlusLambda.isSelected());
-
+		conf.setStrategy(getStrategy());
 	}
 
 	private SpinnerNumberModel createColSpinnerModel(ChangeListener classDimensionChangeListener) {

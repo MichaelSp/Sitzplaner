@@ -7,6 +7,8 @@ public class Configuration implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 5167515545796099132L;
 	private boolean strategiePlus = true;
+	private Strategy strategy = Strategy.Normal;
+	private int tournamentSize = 0;
 	private int parents = 10;
 
 	private int childrenUsingInversion = 10;
@@ -25,7 +27,7 @@ public class Configuration implements Serializable, Cloneable {
 	@Override
 	public String toString() {
 		String ret = strategiePlus ? "+" : ",";
-		ret = " [" + parents + ret + getNumberOfDescendents() + "] ";
+		ret = " [" + parents + ret + getNumberOfDescendents() + "]" + strategy.toString();
 		ret += " I=" + childrenUsingInversion + "; S=" + childrenUsingSwap;
 		ret += " W(" + weightingPriority + "," + weightingRight + "," + weightingRight2 + "," + weightingDiagonal + ","
 				+ weightingBottom + ")";
@@ -62,7 +64,6 @@ public class Configuration implements Serializable, Cloneable {
 
 	public void setStrategiePlus(boolean strategiePlus) {
 		this.strategiePlus = strategiePlus;
-		ConfigManager.instance().currentConfigUpdated();
 	}
 
 	public int getParents() {
@@ -128,7 +129,6 @@ public class Configuration implements Serializable, Cloneable {
 
 	public void setColor(Color color) {
 		this.color = color;
-		ConfigManager.instance().currentConfigUpdated();
 	}
 
 	public int getNumberOfDescendents() {
@@ -158,4 +158,22 @@ public class Configuration implements Serializable, Cloneable {
 	public void setNumberOfSwaps(int swaps) {
 		numberOfSwaps = swaps;
 	}
+
+	public Strategy getStrategy() {
+		return strategy;
+	}
+
+	public void setStrategy(Strategy strategy) {
+		this.strategy = strategy;
+
+	}
+
+	public int getTournamentSize() {
+		return tournamentSize;
+	}
+
+	public void setTournamentSize(int tournamentSize) {
+		this.tournamentSize = tournamentSize;
+	}
+
 }

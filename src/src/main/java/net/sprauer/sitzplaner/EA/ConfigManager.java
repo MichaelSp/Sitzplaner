@@ -18,7 +18,6 @@ public class ConfigManager extends AbstractListModel implements Iterable<Configu
 	private Vector<Configuration> parameters = new Vector<Configuration>();
 	private int currentIndex = 0;
 	private boolean blockUpdates;
-	private final boolean configurationChanged = false;
 
 	private ConfigManager() {
 		parameters.add(new Configuration());
