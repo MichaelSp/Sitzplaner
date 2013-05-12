@@ -30,6 +30,7 @@ public class ClassRoom extends JPanel {
 	Legende legende = null;
 	private final JLabel lblFitness;
 	private Chromosome chromosome;
+	private boolean updating;
 
 	private ClassRoom() {
 		eventListener = new ClassRoomEventListener(this);
@@ -87,6 +88,7 @@ public class ClassRoom extends JPanel {
 	}
 
 	public void showChromosome(Chromosome chromosome) {
+		updating = true;
 		clear();
 		this.chromosome = chromosome;
 		StatisticsPanel.instance().setCurrentFitness(chromosome.getFitness());
@@ -101,6 +103,11 @@ public class ClassRoom extends JPanel {
 		validate();
 		setFocusable(true);
 		requestFocusInWindow();
+		updating = false;
+	}
+
+	public boolean isUpdating() {
+		return updating;
 	}
 
 	public void clear() {

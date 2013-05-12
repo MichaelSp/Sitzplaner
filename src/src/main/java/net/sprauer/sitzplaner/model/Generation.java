@@ -7,6 +7,7 @@ import java.util.Vector;
 import net.sprauer.sitzplaner.EA.Chromosome;
 import net.sprauer.sitzplaner.EA.Configuration;
 import net.sprauer.sitzplaner.EA.EAFactory;
+import net.sprauer.sitzplaner.view.ClassRoom;
 
 public class Generation {
 
@@ -31,6 +32,9 @@ public class Generation {
 	private void add(List<Chromosome> children) {
 		for (Chromosome chromosome : children) {
 			add(chromosome);
+		}
+		if (!ClassRoom.instance().isUpdating() && population.size() % 20 == 0) {
+			ClassRoom.instance().showChromosome(bestSolution);
 		}
 	}
 

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.sprauer.sitzplaner</groupId>
 	<artifactId>net.sprauer.sitzplaner</artifactId>
-	<version>0.2.0.0</version>
+	<version>0.2.1.0</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -110,4 +110,8 @@
 			</plugin>
 		</plugins>
 	</build>
+	<scm>
+		<url>http://repo.sprauer.net/</url>
+		<connection>scm:git:ssh://git@sprauer.net:443/studium/studienarbeit-ii.git</connection>
+	</scm>
 </project>

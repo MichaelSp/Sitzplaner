@@ -3,6 +3,7 @@ package net.sprauer.sitzplaner.EA.operations;
 import java.awt.Point;
 
 import net.sprauer.sitzplaner.EA.Chromosome;
+import net.sprauer.sitzplaner.EA.Configuration;
 import net.sprauer.sitzplaner.EA.EAOperation;
 import net.sprauer.sitzplaner.model.DataBase;
 import net.sprauer.sitzplaner.model.Student;
@@ -30,20 +31,26 @@ public class OperationFitness extends EAOperation {
 
 	private double getRelationsFor(Student student, Point position) {
 		double fitness = 0;
-		fitness += gene.getConfig().getWeightingRight() * relationToRight(student, position);
-		fitness += gene.getConfig().getWeightingRight2() * student.relationTo(gene.studentAt(rightOf(rightOf(position))));
-		fitness += gene.getConfig().getWeightingBottom() * student.relationTo(gene.studentAt(under(position)));
+		final Configuration config = gene.getConfig();
+		fitness += config.getWeightingRight() * student.relationTo(gene.studentAt(rightOf(position)));
+		fitness += config.getWeightingRight2() * student.relationTo(gene.studentAt(rightOf(rightOf(position))));
+		fitness += config.getWeightingBottom() * student.relationTo(gene.studentAt(under(position)));
+		fitness += config.getWeightingDiagonal() * student.relationTo(gene.studentAt(under(rightOf(position))));
+		fitness += config.getWeightingDiagonal() * student.relationTo(gene.studentAt(under(leftOf(position))));
 		return fitness;
-	}
-
-	private int relationToRight(Student student, Point currentStudentsPosition) {
-		return student.relationTo(gene.studentAt(rightOf(currentStudentsPosition)));
 	}
 
 	private Point under(Point oldPos) {
 		Point pos = new Point();
 		pos.x = oldPos.x;
 		pos.y = oldPos.y + 1;
+		return pos;
+	}
+
+	private Point leftOf(Point position) {
+		Point pos = new Point();
+		pos.x = position.x - 1;
+		pos.y = position.y;
 		return pos;
 	}
 
