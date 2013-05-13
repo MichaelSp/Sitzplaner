@@ -31,6 +31,11 @@ public class ClassRoomEventListener extends ComponentAdapter implements MouseWhe
 		Parameter.offsetY = (classRoom.getHeight() - Parameter.maxHeight) / 2;
 		classRoom.blackboard.init(classRoom.getSize());
 		classRoom.legende.init(classRoom.getSize());
+		classRoom.btnWorse.setLocation(Parameter.offsetX - classRoom.btnWorse.getWidth() - 2, classRoom.getSize().height
+				- classRoom.btnWorse.getHeight() - 2);
+		classRoom.btnBetter.setLocation(Parameter.offsetX + classRoom.blackboard.getWidth() + 2, classRoom.getSize().height
+				- classRoom.btnBetter.getHeight() - 2);
+
 		classRoom.validate();
 		classRoom.updateTablePositions();
 	}

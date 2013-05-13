@@ -9,12 +9,12 @@ import net.sprauer.sitzplaner.EA.Chromosome;
 import net.sprauer.sitzplaner.EA.Configuration;
 import net.sprauer.sitzplaner.EA.EAFactory;
 import net.sprauer.sitzplaner.EA.Strategy;
-import net.sprauer.sitzplaner.view.ClassRoom;
 
 public class Generation {
 
 	private List<Chromosome> population = new Vector<Chromosome>();
 	Chromosome bestSolution = null;
+	Chromosome worstSolution = null;
 	private final Configuration configuration;
 
 	public Generation(Configuration conf) throws Exception {
@@ -29,14 +29,16 @@ public class Generation {
 	public void clear() {
 		population = new Vector<Chromosome>();
 		bestSolution = null;
+		worstSolution = null;
+	}
+
+	public List<Chromosome> getPopulation() {
+		return population;
 	}
 
 	private void add(List<Chromosome> children) {
 		for (Chromosome chromosome : children) {
 			add(chromosome);
-		}
-		if (!ClassRoom.instance().isUpdating() && population.size() % 20 == 0) {
-			ClassRoom.instance().showChromosome(bestSolution);
 		}
 	}
 
@@ -44,6 +46,9 @@ public class Generation {
 		population.add(chrome);
 		if (bestSolution == null || chrome.getFitness() >= bestSolution.getFitness()) {
 			bestSolution = chrome;
+		}
+		if (worstSolution == null || chrome.getFitness() <= worstSolution.getFitness()) {
+			worstSolution = chrome;
 		}
 	}
 
@@ -105,11 +110,21 @@ public class Generation {
 	}
 
 	private void tournamentSelection(List<Chromosome> parents) {
-		while (parents.size() < configuration.getTournamentSize() && parents.size() < population.size()) {
+		int best = population.size();
+		for (int i = 0; i < configuration.getTournamentSize(); i++) {
 			int index = (int) (Math.random() * population.size());
-			if (!parents.contains(population.get(index))) {
-				parents.add(population.get(index));
+			if (index < best) {
+				best = index;
 			}
 		}
+		parents.add(population.get(best));
+	}
+
+	public Chromosome getWorstSolution() {
+		return worstSolution;
+	}
+
+	public void sortPopulation() {
+		Collections.sort(population);
 	}
 }

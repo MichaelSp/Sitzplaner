@@ -34,7 +34,8 @@ public class EAFactory {
 				generationsPool.put(conf, generation);
 			}
 			generation.evolve();
-			StatisticsPanel.instance().addFitness(conf, generation.getBestSolution().getFitness());
+			StatisticsPanel.instance().addFitness(conf, generation.getBestSolution().getFitness(),
+					generation.getWorstSolution().getFitness());
 		}
 	}
 
@@ -49,10 +50,7 @@ public class EAFactory {
 	public static void showChromosomeForCurrentConfig() {
 		final Configuration currentConfig = ConfigManager.instance().getCurrentConfig();
 		if (generationsPool.containsKey(currentConfig)) {
-			Chromosome display = generationsPool.get(currentConfig).getBestSolution();
-			if (display != null) {
-				ClassRoom.instance().showChromosome(display);
-			}
+			ClassRoom.instance().setGeneration(generationsPool.get(currentConfig));
 		}
 	}
 

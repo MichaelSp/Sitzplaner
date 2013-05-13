@@ -6,15 +6,18 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Polygon;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sprauer.sitzplaner.EA.Chromosome;
 import net.sprauer.sitzplaner.model.DataBase;
+import net.sprauer.sitzplaner.model.Generation;
 import net.sprauer.sitzplaner.view.helper.Parameter;
 import net.sprauer.sitzplaner.view.panels.StatisticsPanel;
 
@@ -28,9 +31,11 @@ public class ClassRoom extends JPanel {
 	private int selectedRelationValue;
 	ClassRoomEventListener eventListener;
 	Legende legende = null;
-	private final JLabel lblFitness;
-	private Chromosome chromosome;
+	private Generation generation;
+	int currentGeneIndex;
 	private boolean updating;
+	final JButton btnWorse;
+	final JButton btnBetter;
 
 	private ClassRoom() {
 		eventListener = new ClassRoomEventListener(this);
@@ -39,16 +44,54 @@ public class ClassRoom extends JPanel {
 		blackboard = new Blackboard();
 		legende = new Legende();
 
+		btnBetter = new JButton(">>");
+		btnBetter.setEnabled(false);
+		btnBetter.setSize(new Dimension(50, 23));
+		btnBetter.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if ((arg0.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK) {
+					currentGeneIndex = 0;
+				} else {
+					currentGeneIndex--;
+				}
+				updateNavigationButtons();
+				showCurrentGene();
+			}
+
+		});
+		add(btnBetter);
+
+		btnWorse = new JButton("<<");
+		btnWorse.setEnabled(false);
+		btnWorse.setSize(new Dimension(50, 23));
+		btnWorse.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if ((arg0.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK) {
+					currentGeneIndex = generation.getPopulation().size() - 1;
+				} else {
+					currentGeneIndex++;
+				}
+				updateNavigationButtons();
+				showCurrentGene();
+			}
+		});
+		add(btnWorse);
+
 		Dimension size = new Dimension(800, 400);
 		applySize(size);
 
 		add(blackboard);
 		add(legende);
 
-		lblFitness = new JLabel("0.0");
-		lblFitness.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		lblFitness.setBounds(0, 10, getWidth(), 20);
-		add(lblFitness);
+	}
+
+	private void updateNavigationButtons() {
+		boolean last = (currentGeneIndex >= generation.getPopulation().size() - 1);
+		boolean first = currentGeneIndex <= 0;
+		btnWorse.setEnabled(!last);
+		btnBetter.setEnabled(!first);
 	}
 
 	private void applySize(Dimension size) {
@@ -87,23 +130,37 @@ public class ClassRoom extends JPanel {
 		}
 	}
 
-	public void showChromosome(Chromosome chromosome) {
+	public void setGeneration(Generation generation) {
+		updating = true;
+		this.generation = generation;
+		this.generation.sortPopulation();
+		currentGeneIndex = 0;
+
+		showCurrentGene();
+		updateNavigationButtons();
+		updating = false;
+	}
+
+	private void showCurrentGene() {
 		updating = true;
 		clear();
-		this.chromosome = chromosome;
-		StatisticsPanel.instance().setCurrentFitness(chromosome.getFitness());
+		final Chromosome currentGene = getCurrentGene();
+		StatisticsPanel.instance().setCurrentFitness(currentGene.getFitness());
 
-		for (int students = 0; students < chromosome.size(); students++) {
+		for (int students = 0; students < currentGene.size(); students++) {
 			Table table = new Table(students, this);
 			tables.add(table);
 			add(table);
-			table.setPosition(chromosome.getPositionOf(students));
+			table.setPosition(currentGene.getPositionOf(students));
 		}
-		lblFitness.setText("" + chromosome.getFitness());
 		validate();
 		setFocusable(true);
 		requestFocusInWindow();
 		updating = false;
+	}
+
+	private Chromosome getCurrentGene() {
+		return generation.getPopulation().get(currentGeneIndex);
 	}
 
 	public boolean isUpdating() {
@@ -111,7 +168,6 @@ public class ClassRoom extends JPanel {
 	}
 
 	public void clear() {
-		chromosome = null;
 		for (TableBase table : tables) {
 			remove(table);
 		}
@@ -185,6 +241,7 @@ public class ClassRoom extends JPanel {
 		Parameter.numCols = dim.width;
 		Parameter.numRows = dim.height;
 
+		generation = null;
 		clear();
 		Parameter.widthFactor = Parameter.cellWidth + Parameter.spacing / 2;
 		Parameter.heightFactor = Parameter.cellHeight + Parameter.spacing / 2;
@@ -204,14 +261,13 @@ public class ClassRoom extends JPanel {
 
 	public void updateTablePositions() {
 		for (Table table : tables) {
-			table.setPosition(chromosome.getPositionOf(table.student()));
+			table.setPosition(getCurrentGene().getPositionOf(table.student()));
 		}
 		validate();
 	}
 
 	public void lockStudent(int studentIdx, boolean locked) {
-		Point lockPos = locked ? chromosome.getPositionOf(studentIdx) : null;
+		Point lockPos = locked ? getCurrentGene().getPositionOf(studentIdx) : null;
 		DataBase.instance().getStudent(studentIdx).setLockPosition(lockPos);
 	}
-
 }
