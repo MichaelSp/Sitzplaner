@@ -11,6 +11,10 @@ public class CommandNewSeatingPlan extends AbstractCommand {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		if (EAFactory.isCalculating()) {
+			EAFactory.stop();
+			return;
+		}
 		new Thread(new Runnable() {
 			@Override
 			public void run() {

@@ -14,6 +14,8 @@ public class EAFactory {
 
 	private static int numOfGenerations = 1;
 	static Map<Configuration, Generation> generationsPool = new HashMap<Configuration, Generation>();
+	static boolean calculationActive = false;
+	static boolean stopRequested = false;
 
 	static double fitness(Chromosome gene) throws Exception {
 		new OperationFitness().invoke(gene);
@@ -40,11 +42,20 @@ public class EAFactory {
 	}
 
 	public static void nextGenerations() throws Exception {
+		calculationActive = true;
 		for (int i = 0; i < numOfGenerations; i++) {
 			nextGeneration();
-			ToolsPanel.instance().setProgress(i, numOfGenerations);
+
+			if (stopRequested) {
+				stopRequested = false;
+				ToolsPanel.instance().setProgress(i, i);
+				break;
+			} else {
+				ToolsPanel.instance().setProgress(i, numOfGenerations);
+			}
 		}
 		showChromosomeForCurrentConfig();
+		calculationActive = false;
 	}
 
 	public static void showChromosomeForCurrentConfig() {
@@ -64,4 +75,11 @@ public class EAFactory {
 
 	}
 
+	public static boolean isCalculating() {
+		return calculationActive;
+	}
+
+	public static void stop() {
+		stopRequested = true;
+	}
 }

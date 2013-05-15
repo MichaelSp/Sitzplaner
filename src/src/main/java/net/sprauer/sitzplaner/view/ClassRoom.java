@@ -154,6 +154,7 @@ public class ClassRoom extends JPanel {
 			table.setPosition(currentGene.getPositionOf(students));
 		}
 		validate();
+		eventListener.componentResized(null);
 		setFocusable(true);
 		requestFocusInWindow();
 		updating = false;

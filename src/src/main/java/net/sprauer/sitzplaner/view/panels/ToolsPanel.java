@@ -117,6 +117,9 @@ public class ToolsPanel extends JPanel {
 	private JLabel lblDistanceToBlackboard;
 	private JRadioButton rdbRank;
 	private JRadioButton rdbTournament;
+	private JRadioButton rdbNormal;
+	private JSpinner spnTournamentSize;
+	private JPanel panel_4;
 
 	private final ChangeListener weightingChangedListener = new ChangeListener() {
 
@@ -167,9 +170,6 @@ public class ToolsPanel extends JPanel {
 			EAFactory.showChromosomeForCurrentConfig();
 		}
 	};
-	private JRadioButton rdbNormal;
-	private JSpinner spnTournamentSize;
-	private JPanel panel_4;
 
 	private void createRadioButtonGroup() {
 		ButtonGroup g = new ButtonGroup();
@@ -229,7 +229,10 @@ public class ToolsPanel extends JPanel {
 		final int swap = (Integer) spnSwap.getValue();
 		final int inversion = (Integer) spnInversion.getValue();
 		final int numParents = (Integer) spnParents.getValue();
-		final int numDescendants = (inversion + swap) * numParents;
+		int numDescendants = (inversion + swap);
+		if (!rdbTournament.isSelected()) {
+			numDescendants = numDescendants * numParents;
+		}
 		lblDescendants.setText("" + numDescendants);
 		lblDescendants1.setText("" + numDescendants);
 		lblSwap.setText("" + (swap * numParents));
@@ -1105,7 +1108,7 @@ public class ToolsPanel extends JPanel {
 
 	public void setProgress(int i, int max) {
 		final boolean progressbarVisible = i <= max - 2;
-		btnNewSeatingPlan.setEnabled(!progressbarVisible);
+		btnNewSeatingPlan.setText(progressbarVisible ? "Cancel" : "Calculate");
 		progressBar.setVisible(progressbarVisible);
 		progressBar.setMaximum(max);
 		progressBar.setValue(i);

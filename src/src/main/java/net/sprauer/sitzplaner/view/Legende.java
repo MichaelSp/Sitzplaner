@@ -2,6 +2,7 @@ package net.sprauer.sitzplaner.view;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -24,17 +25,20 @@ public class Legende extends JComponent {
 		setLayout(springLayout);
 
 		JLabel lblGood = new JLabel("GOOD");
+		lblGood.setFont(new Font("Tahoma", Font.BOLD, 11));
 		springLayout.putConstraint(SpringLayout.WEST, lblGood, 10, SpringLayout.WEST, this);
 		springLayout.putConstraint(SpringLayout.EAST, lblGood, 109, SpringLayout.WEST, this);
 		add(lblGood);
 
 		JLabel lblBad = new JLabel("BAD");
+		lblBad.setFont(new Font("Tahoma", Font.BOLD, 11));
 		springLayout.putConstraint(SpringLayout.WEST, lblBad, 0, SpringLayout.WEST, lblGood);
 		springLayout.putConstraint(SpringLayout.SOUTH, lblBad, -10, SpringLayout.SOUTH, this);
 		add(lblBad);
 		setLocation(0, 0);
 
 		JLabel lblFront = new JLabel("Front");
+		lblFront.setFont(new Font("Tahoma", Font.BOLD, 11));
 		springLayout.putConstraint(SpringLayout.EAST, lblBad, 0, SpringLayout.EAST, lblFront);
 		springLayout.putConstraint(SpringLayout.NORTH, lblGood, 6, SpringLayout.SOUTH, lblFront);
 		springLayout.putConstraint(SpringLayout.NORTH, lblFront, 10, SpringLayout.NORTH, this);
@@ -42,6 +46,7 @@ public class Legende extends JComponent {
 		add(lblFront);
 
 		JLabel lblBack = new JLabel("Back");
+		lblBack.setFont(new Font("Tahoma", Font.BOLD, 11));
 		springLayout.putConstraint(SpringLayout.NORTH, lblBack, 6, SpringLayout.SOUTH, lblGood);
 		springLayout.putConstraint(SpringLayout.WEST, lblBack, 10, SpringLayout.WEST, this);
 		springLayout.putConstraint(SpringLayout.SOUTH, lblBack, -6, SpringLayout.NORTH, lblBad);

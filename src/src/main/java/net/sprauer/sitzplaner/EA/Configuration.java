@@ -132,7 +132,12 @@ public class Configuration implements Serializable, Cloneable {
 	}
 
 	public int getNumberOfDescendents() {
-		return ((childrenUsingInversion + childrenUsingSwap) * parents);
+		final int num = childrenUsingInversion + childrenUsingSwap;
+		if (getStrategy() == Strategy.Tournament) {
+			return num;
+		} else {
+			return (num * parents);
+		}
 	}
 
 	public int getWeightingPriority() {
