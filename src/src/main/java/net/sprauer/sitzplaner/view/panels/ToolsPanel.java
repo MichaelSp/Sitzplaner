@@ -1106,12 +1106,28 @@ public class ToolsPanel extends JPanel {
 		lstSettings.setSelectedIndex(index);
 	}
 
-	public void setProgress(int i, int max) {
+	public synchronized void setProgress(int i, int max) {
 		final boolean progressbarVisible = i <= max - 2;
-		btnNewSeatingPlan.setText(progressbarVisible ? "Cancel" : "Calculate");
 		progressBar.setVisible(progressbarVisible);
 		progressBar.setMaximum(max);
 		progressBar.setValue(i);
+	}
+
+	public void setCalculationActive(boolean calculationActive) {
+		btnNewSeatingPlan.setText(calculationActive ? "Cancel" : "Calculate");
+		btnCreate.setEnabled(!calculationActive);
+		btnLoadClass.setEnabled(!calculationActive);
+		btnSaveClass.setEnabled(!calculationActive);
+		btnSettingsLoad.setEnabled(!calculationActive);
+		btnSettingsSave.setEnabled(!calculationActive);
+		if (calculationActive) {
+			btnSettingsNew.setEnabled(false);
+			btnSettingsDelete.setEnabled(false);
+		} else {
+			btnSettingsNew.setEnabled(ConfigManager.instance().getSize() < Configuration.colors().length);
+			btnSettingsDelete.setEnabled(ConfigManager.instance().getSize() > 1);
+		}
+		validate();
 	}
 
 }

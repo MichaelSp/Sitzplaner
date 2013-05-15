@@ -1,7 +1,10 @@
 package net.sprauer.sitzplaner.EA;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -18,6 +21,7 @@ public class EAFactory {
 	static Map<Configuration, Generation> generationsPool = new HashMap<Configuration, Generation>();
 	static boolean calculationActive = false;
 	static boolean stopRequested = false;
+	private static ExecutorService exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
 	static double fitness(Chromosome gene) throws Exception {
 		new OperationFitness().invoke(gene);
@@ -30,9 +34,9 @@ public class EAFactory {
 		return chrome;
 	}
 
-	public static void nextGeneration(ExecutorService exec) throws Exception {
+	public static void nextGeneration(List<Callable<Object>> todo) throws Exception {
 		for (final Configuration conf : ConfigManager.instance()) {
-			exec.execute(new Runnable() {
+			todo.add(Executors.callable(new Runnable() {
 
 				@Override
 				public void run() {
@@ -40,36 +44,36 @@ public class EAFactory {
 					if (generation == null) {
 						try {
 							generation = new Generation(conf);
+							generationsPool.put(conf, generation);
 						} catch (Exception e) {
 							e.printStackTrace();
+							return;
 						}
-						generationsPool.put(conf, generation);
 					}
 					generation.evolve();
 					StatisticsPanel.instance().addFitness(conf, generation.getBestSolution().getFitness(),
 							generation.getWorstSolution().getFitness());
 				}
-			});
+			}));
 
 		}
 	}
 
 	public static void nextGenerations() throws Exception {
-		calculationActive = true;
-		ExecutorService exec = Executors.newFixedThreadPool(ConfigManager.instance().getSize() * 10);
-		for (int i = 0; i < numOfGenerations; i++) {
-			nextGeneration(exec);
+		try {
+			calculationActive = true;
+			ToolsPanel.instance().setCalculationActive(true);
+			List<Callable<Object>> tasks = new ArrayList<Callable<Object>>();
 
-			if (stopRequested) {
-				stopRequested = false;
-				ToolsPanel.instance().setProgress(i, i);
-				break;
-			} else {
+			for (int i = 0; i < numOfGenerations; i++) {
+				nextGeneration(tasks);
 				ToolsPanel.instance().setProgress(i, numOfGenerations);
 			}
+			exec.invokeAll(tasks);
+		} finally {
+			showChromosomeForCurrentConfig();
+			stop();
 		}
-		showChromosomeForCurrentConfig();
-		calculationActive = false;
 	}
 
 	public static void showChromosomeForCurrentConfig() {
@@ -94,6 +98,10 @@ public class EAFactory {
 	}
 
 	public static void stop() {
-		stopRequested = true;
+		exec.shutdownNow();
+		ToolsPanel.instance().setProgress(1, 1);
+		calculationActive = false;
+		ToolsPanel.instance().setCalculationActive(false);
+		exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	}
 }
