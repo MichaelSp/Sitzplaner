@@ -31,6 +31,10 @@ public class Generation {
 		bestSolution = null;
 		worstSolution = null;
 	}
+	
+	public Configuration getConfiguration() {
+		return configuration;
+	}
 
 	public List<Chromosome> getPopulation() {
 		return population;
@@ -52,7 +56,7 @@ public class Generation {
 		}
 	}
 
-	public void evolve() {
+	public synchronized  void evolve() {
 		Collections.sort(population);
 		List<Chromosome> parents = selecteTheBestAndKillTheRest();
 

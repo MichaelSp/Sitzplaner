@@ -1020,7 +1020,7 @@ public class ToolsPanel extends JPanel {
 		gbc_spnNumberOfGenerations.gridx = 1;
 		gbc_spnNumberOfGenerations.gridy = 2;
 		add(spnNumberOfGenerations, gbc_spnNumberOfGenerations);
-		spnNumberOfGenerations.setModel(new SpinnerNumberModel(10, 1, 1000000, 1));
+		spnNumberOfGenerations.setModel(new SpinnerNumberModel(250, 1, 1000000, 1));
 
 		btnNewSeatingPlan = new JButton();
 		GridBagConstraints gbc_btnNewSeatingPlan = new GridBagConstraints();
