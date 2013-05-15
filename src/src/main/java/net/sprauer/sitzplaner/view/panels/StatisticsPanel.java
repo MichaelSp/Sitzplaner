@@ -1,10 +1,13 @@
 package net.sprauer.sitzplaner.view.panels;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Shape;
+import java.awt.Stroke;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +23,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
@@ -189,12 +193,15 @@ public class StatisticsPanel extends JPanel {
 		txtDelta.setText("" + (best - worst));
 		Series series = seriesMap.get(conf);
 		if (series == null) {
-			int index = seriesMap.size();
-			series = new Series(index + 1);
+			series = new Series(seriesCollection.getSeriesCount());
 			seriesCollection.addSeries(series.best);
 			seriesCollection.addSeries(series.worst);
-			chart.getXYPlot().getRenderer().setSeriesPaint(index, conf.getColor());
-			chart.getXYPlot().getRenderer().setSeriesPaint(index + 1, conf.getColor());
+			XYItemRenderer renderer = chart.getXYPlot().getRenderer();
+			float[] dash = {10.0f};
+			int worstIndex = seriesCollection.getSeriesIndex(series.worst.getKey());
+			renderer.setSeriesPaint(seriesCollection.getSeriesIndex(series.best.getKey()), conf.getColor());
+			renderer.setSeriesPaint(worstIndex, conf.getColor());
+			renderer.setSeriesStroke(worstIndex, new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 1.0f, dash, 3.0f) );
 			seriesMap.put(conf, series);
 		}
 		if (series.best.getItemCount() == 0) {
@@ -210,6 +217,9 @@ public class StatisticsPanel extends JPanel {
 		seriesMap.clear();
 		seriesCollection.removeAllSeries();
 		txtBestFitness.setText("0.0");
+		txtWorstFitness.setText("0.0");
+		txtDelta.setText("0.0");
+		txtCurrentFitness.setText("0.0");
 		validate();
 	}
 
