@@ -144,8 +144,10 @@ public class ClassRoom extends JPanel {
 	private void showCurrentGene() {
 		updating = true;
 		clear();
+		if (generation == null)
+			return;
 		final Chromosome currentGene = getCurrentGene();
-		StatisticsPanel.instance().setCurrentFitness(currentGene.getFitness());
+		StatisticsPanel.instance().setCurrentConfiguration(generation.getConfiguration(), currentGene.getFitness());
 
 		for (int students = 0; students < currentGene.size(); students++) {
 			Table table = new Table(students, this);
