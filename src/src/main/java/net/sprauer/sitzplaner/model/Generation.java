@@ -56,7 +56,7 @@ public class Generation {
 		}
 	}
 
-	public void evolve() {
+	public synchronized  void evolve() {
 		Collections.sort(population);
 		List<Chromosome> parents = selecteTheBestAndKillTheRest();
 

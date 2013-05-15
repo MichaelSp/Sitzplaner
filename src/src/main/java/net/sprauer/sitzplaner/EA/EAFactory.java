@@ -2,6 +2,8 @@ package net.sprauer.sitzplaner.EA;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import net.sprauer.sitzplaner.EA.operations.OperationFitness;
 import net.sprauer.sitzplaner.EA.operations.OperationGreedy;
@@ -26,22 +28,34 @@ public class EAFactory {
 		return chrome;
 	}
 
-	public static void nextGeneration() throws Exception {
-		for (Configuration conf : ConfigManager.instance()) {
-			Generation generation = generationsPool.get(conf);
-			if (generation == null) {
-				generation = new Generation(conf);
-				generationsPool.put(conf, generation);
-			}
-			generation.evolve();
-			StatisticsPanel.instance().addFitness(conf, generation.getBestSolution().getFitness(),
-					generation.getWorstSolution().getFitness());
+	public static void nextGeneration(ExecutorService exec) throws Exception {
+		for (final Configuration conf : ConfigManager.instance()) {
+			exec.execute(new Runnable() {
+				
+				@Override
+				public void run() {
+					Generation generation = generationsPool.get(conf);
+					if (generation == null) {
+						try {
+							generation = new Generation(conf);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						generationsPool.put(conf, generation);
+					}
+					generation.evolve();
+					StatisticsPanel.instance().addFitness(conf, generation.getBestSolution().getFitness(),
+							generation.getWorstSolution().getFitness());					
+				}
+			});
+			
 		}
 	}
 
 	public static void nextGenerations() throws Exception {
+		ExecutorService exec = Executors.newFixedThreadPool(ConfigManager.instance().getSize()*10);
 		for (int i = 0; i < numOfGenerations; i++) {
-			nextGeneration();
+			nextGeneration(exec);
 			ToolsPanel.instance().setProgress(i, numOfGenerations);
 		}
 		showChromosomeForCurrentConfig();

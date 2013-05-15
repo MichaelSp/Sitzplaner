@@ -144,6 +144,8 @@ public class ClassRoom extends JPanel {
 	private void showCurrentGene() {
 		updating = true;
 		clear();
+		if (generation == null)
+			return;
 		final Chromosome currentGene = getCurrentGene();
 		StatisticsPanel.instance().setCurrentConfiguration(generation.getConfiguration(), currentGene.getFitness());
 

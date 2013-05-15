@@ -220,7 +220,7 @@ public class StatisticsPanel extends JPanel {
 
 	}
 
-	public void addFitness(Configuration conf, double best, double worst) {
+	public synchronized void addFitness(Configuration conf, double best, double worst) {
 		Series series = seriesMap.get(conf);
 		if (series == null) {
 			series = new Series(seriesCollection.getSeriesCount(), conf.getColor());
