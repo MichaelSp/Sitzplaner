@@ -269,12 +269,10 @@ public class ToolsPanel extends JPanel {
 
 		ConfigManager.instance().addListDataListener(new ListDataListener() {
 			@Override
-			public void intervalRemoved(ListDataEvent arg0) {
-			}
+			public void intervalRemoved(ListDataEvent arg0) {}
 
 			@Override
-			public void intervalAdded(ListDataEvent arg0) {
-			}
+			public void intervalAdded(ListDataEvent arg0) {}
 
 			@Override
 			public void contentsChanged(ListDataEvent arg0) {
@@ -376,8 +374,7 @@ public class ToolsPanel extends JPanel {
 		gbc_classSize.gridx = 3;
 		gbc_classSize.gridy = 0;
 		pnlClassRoomSize.add(classSize, gbc_classSize);
-		classSize.setModel(new SpinnerNumberModel(new Short((short) 1), new Short((short) 1), new Short((short) 1), new Short(
-				(short) 1)));
+		classSize.setModel(new SpinnerNumberModel(new Short((short) 1), new Short((short) 1), new Short((short) 1), new Short((short) 1)));
 		classSize.setValue(new Short((short) (Parameter.numCols * Parameter.numRows)));
 		classSize.getModel().addChangeListener(new ChangeListener() {
 
@@ -487,8 +484,7 @@ public class ToolsPanel extends JPanel {
 		btnSettingsSave = new JButton(Factory.CommandSaveSettings);
 		btnSettingsSave.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent arg0) {
-			}
+			public void actionPerformed(ActionEvent arg0) {}
 		});
 		GridBagConstraints gbc_btnSave = new GridBagConstraints();
 		gbc_btnSave.fill = GridBagConstraints.HORIZONTAL;
@@ -542,8 +538,7 @@ public class ToolsPanel extends JPanel {
 		panel.add(rdbCommaLambda, gbc_rdbCommaLambda);
 
 		panel_4 = new JPanel();
-		panel_4.setBorder(new TitledBorder(null, "Additional Selection Methods", TitledBorder.LEADING, TitledBorder.TOP, null,
-				null));
+		panel_4.setBorder(new TitledBorder(null, "Additional Selection Methods", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		GridBagConstraints gbc_panel_4 = new GridBagConstraints();
 		gbc_panel_4.insets = new Insets(0, 0, 5, 0);
 		gbc_panel_4.gridheight = 4;
@@ -1106,11 +1101,9 @@ public class ToolsPanel extends JPanel {
 		lstSettings.setSelectedIndex(index);
 	}
 
-	public synchronized void setProgress(int i, int max) {
-		final boolean progressbarVisible = i <= max - 2;
-		progressBar.setVisible(progressbarVisible);
+	public synchronized void setMaxProgress(int max) {
 		progressBar.setMaximum(max);
-		progressBar.setValue(i);
+		progressBar.setVisible(true);
 	}
 
 	public void setCalculationActive(boolean calculationActive) {
@@ -1128,6 +1121,15 @@ public class ToolsPanel extends JPanel {
 			btnSettingsDelete.setEnabled(ConfigManager.instance().getSize() > 1);
 		}
 		validate();
+	}
+
+	public void stepProgress() {
+		progressBar.setValue(progressBar.getValue() + 1);
+	}
+
+	public void resetProgress() {
+		progressBar.setVisible(false);
+		progressBar.setValue(0);
 	}
 
 }

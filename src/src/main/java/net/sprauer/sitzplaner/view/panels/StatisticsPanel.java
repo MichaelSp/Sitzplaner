@@ -6,8 +6,6 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Shape;
-import java.awt.Stroke;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,31 +40,27 @@ public class StatisticsPanel extends JPanel {
 	private final JTextField txtDelta;
 	private final JLabel lblWorstFitness_1;
 	private final JTextField txtCurrentFitness;
-	
+
 	private class Series {
 		public Series(int index, Color color) {
 			best = new XYSeries("best Fitness " + index);
 			worst = new XYSeries("worst Fitness " + index);
-			
+
 			seriesCollection.addSeries(best);
 			seriesCollection.addSeries(worst);
 			XYItemRenderer renderer = chart.getXYPlot().getRenderer();
 			int worstIndex = seriesCollection.getSeriesIndex(worst.getKey());
 			renderer.setSeriesPaint(seriesCollection.getSeriesIndex(best.getKey()), color);
 			renderer.setSeriesPaint(worstIndex, color);
-			renderer.setSeriesStroke(worstIndex, new BasicStroke(
-				      1f, 
-				      BasicStroke.CAP_ROUND, 
-				      BasicStroke.JOIN_MITER, 
-				      10f, 
-				      new float[] {1.0f,7.0f}, 
-				      0f));
+			renderer.setSeriesStroke(worstIndex, new BasicStroke(1f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 10f, new float[] { 1.0f, 7.0f },
+					0f));
 		}
 
 		XYSeries best;
 		XYSeries worst;
-		double bestFitness=0;
-		double worstFitness=Double.MAX_VALUE;
+		double bestFitness = 0;
+		double worstFitness = Double.MAX_VALUE;
+
 		public void add(double bestValue, double worstValue) {
 			if (best.getItemCount() == 0) {
 				best.add(1, 0);
@@ -79,9 +73,9 @@ public class StatisticsPanel extends JPanel {
 				txtBestFitness.setText("" + bestValue);
 				this.bestFitness = bestValue;
 			}
-			if (worstValue< worstFitness)
+			if (worstValue < worstFitness)
 				worstFitness = worstValue;
-			
+
 			txtCurrentFitness.setText("" + bestValue);
 			txtWorstFitness.setText("" + worstValue);
 			txtDelta.setText("" + (bestValue - worstValue));
@@ -98,26 +92,26 @@ public class StatisticsPanel extends JPanel {
 		gridBagLayout.columnWeights = new double[] { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		gridBagLayout.rowWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
 		setLayout(gridBagLayout);
-		
-				lblWorstFitness = new JLabel("Current Fitness:");
-				GridBagConstraints gbc_lblWorstFitness = new GridBagConstraints();
-				gbc_lblWorstFitness.anchor = GridBagConstraints.EAST;
-				gbc_lblWorstFitness.insets = new Insets(0, 0, 5, 5);
-				gbc_lblWorstFitness.gridx = 1;
-				gbc_lblWorstFitness.gridy = 0;
-				add(lblWorstFitness, gbc_lblWorstFitness);
-		
-				txtCurrentFitness = new JTextField();
-				txtCurrentFitness.setFont(new Font("Tahoma", Font.BOLD, 11));
-				txtCurrentFitness.setEditable(false);
-				txtCurrentFitness.setText("0.0");
-				GridBagConstraints gbc_txtCurrentFitness = new GridBagConstraints();
-				gbc_txtCurrentFitness.insets = new Insets(0, 0, 5, 5);
-				gbc_txtCurrentFitness.fill = GridBagConstraints.HORIZONTAL;
-				gbc_txtCurrentFitness.gridx = 2;
-				gbc_txtCurrentFitness.gridy = 0;
-				add(txtCurrentFitness, gbc_txtCurrentFitness);
-				txtCurrentFitness.setColumns(10);
+
+		lblWorstFitness = new JLabel("Current Fitness:");
+		GridBagConstraints gbc_lblWorstFitness = new GridBagConstraints();
+		gbc_lblWorstFitness.anchor = GridBagConstraints.EAST;
+		gbc_lblWorstFitness.insets = new Insets(0, 0, 5, 5);
+		gbc_lblWorstFitness.gridx = 1;
+		gbc_lblWorstFitness.gridy = 0;
+		add(lblWorstFitness, gbc_lblWorstFitness);
+
+		txtCurrentFitness = new JTextField();
+		txtCurrentFitness.setFont(new Font("Tahoma", Font.BOLD, 11));
+		txtCurrentFitness.setEditable(false);
+		txtCurrentFitness.setText("0.0");
+		GridBagConstraints gbc_txtCurrentFitness = new GridBagConstraints();
+		gbc_txtCurrentFitness.insets = new Insets(0, 0, 5, 5);
+		gbc_txtCurrentFitness.fill = GridBagConstraints.HORIZONTAL;
+		gbc_txtCurrentFitness.gridx = 2;
+		gbc_txtCurrentFitness.gridy = 0;
+		add(txtCurrentFitness, gbc_txtCurrentFitness);
+		txtCurrentFitness.setColumns(10);
 
 		lblWorstFitness_1 = new JLabel("Worst Fitness:");
 		GridBagConstraints gbc_lblWorstFitness_1 = new GridBagConstraints();
@@ -228,7 +222,7 @@ public class StatisticsPanel extends JPanel {
 			series = new Series(seriesCollection.getSeriesCount(), conf.getColor());
 			seriesMap.put(conf, series);
 		}
-		series.add(best,worst);
+		series.add(best, worst);
 	}
 
 	public void clear() {

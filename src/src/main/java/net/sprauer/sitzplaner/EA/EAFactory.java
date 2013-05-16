@@ -34,28 +34,34 @@ public class EAFactory {
 		return chrome;
 	}
 
-	public static void nextGeneration(List<Callable<Object>> todo) throws Exception {
-		for (final Configuration conf : ConfigManager.instance()) {
-			todo.add(Executors.callable(new Runnable() {
+	private static Callable<Object> createTaskForConfiguration(final Configuration conf, final Generation generation) {
+		return Executors.callable(new Runnable() {
 
-				@Override
-				public void run() {
-					Generation generation = generationsPool.get(conf);
-					if (generation == null) {
-						try {
-							generation = new Generation(conf);
-							generationsPool.put(conf, generation);
-						} catch (Exception e) {
-							e.printStackTrace();
-							return;
-						}
-					}
-					generation.evolve();
-					StatisticsPanel.instance().addFitness(conf, generation.getBestSolution().getFitness(),
-							generation.getWorstSolution().getFitness());
+			@Override
+			public void run() {
+				if (stopRequested) {
+					return;
 				}
-			}));
+				generation.evolve();
+				StatisticsPanel.instance().addFitness(conf, generation.getBestSolution().getFitness(), generation.getWorstSolution().getFitness());
+				ToolsPanel.instance().stepProgress();
+			}
+		});
+	}
 
+	public static void createTasksForNextGeneration(List<Callable<Object>> todo) throws Exception {
+		for (final Configuration conf : ConfigManager.instance()) {
+			Generation generation = generationsPool.get(conf);
+			if (generation == null) {
+				try {
+					generation = new Generation(conf);
+					generationsPool.put(conf, generation);
+				} catch (Exception e) {
+					e.printStackTrace();
+					return;
+				}
+			}
+			todo.add(createTaskForConfiguration(conf, generation));
 		}
 	}
 
@@ -66,13 +72,14 @@ public class EAFactory {
 			List<Callable<Object>> tasks = new ArrayList<Callable<Object>>();
 
 			for (int i = 0; i < numOfGenerations; i++) {
-				nextGeneration(tasks);
-				ToolsPanel.instance().setProgress(i, numOfGenerations);
+				createTasksForNextGeneration(tasks);
 			}
+
+			ToolsPanel.instance().setMaxProgress(numOfGenerations * ConfigManager.instance().getSize());
 			exec.invokeAll(tasks);
 		} finally {
 			showChromosomeForCurrentConfig();
-			stop();
+			stopped();
 		}
 	}
 
@@ -90,7 +97,6 @@ public class EAFactory {
 
 	public static void setNumberOfGenerations(int numOfGenerations) {
 		EAFactory.numOfGenerations = numOfGenerations;
-
 	}
 
 	public static boolean isCalculating() {
@@ -98,10 +104,14 @@ public class EAFactory {
 	}
 
 	public static void stop() {
-		exec.shutdownNow();
-		ToolsPanel.instance().setProgress(1, 1);
+		stopRequested = true;
+	}
+
+	private static void stopped() {
+		ToolsPanel.instance().resetProgress();
 		calculationActive = false;
 		ToolsPanel.instance().setCalculationActive(false);
 		exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+		stopRequested = false;
 	}
 }
