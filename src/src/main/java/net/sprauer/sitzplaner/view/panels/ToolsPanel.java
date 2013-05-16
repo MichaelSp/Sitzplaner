@@ -90,7 +90,7 @@ public class ToolsPanel extends JPanel {
 	private JSpinner spnParents;
 	private JScrollPane scrollPane;
 	private JLabel lblParents_1;
-	private JLabel lblParents;
+	private JLabel lblPopulationSize;
 	private JLabel lblDescendants;
 	private JLabel lblDescendents;
 	private JLabel lblDescendantsTotal;
@@ -252,7 +252,7 @@ public class ToolsPanel extends JPanel {
 					return;
 				}
 				int value = (Integer) spnParents.getValue();
-				lblParents.setText("" + adjustParentValueAccordingToTheStrategy(value));
+				lblPopulationSize.setText("" + adjustParentValueAccordingToTheStrategy(value));
 				updateMutationDistribution();
 				ConfigManager.instance().getCurrentConfig().setParents(value);
 			}
@@ -278,10 +278,15 @@ public class ToolsPanel extends JPanel {
 				spnRight.setValue(currentConfig.getWeightingRight());
 				spnRight2.setValue(currentConfig.getWeightingRight2());
 				spnPriority.setValue(currentConfig.getWeightingPriority());
-				spnParents.setValue(currentConfig.getParents());
-				lblParents.setText("" + adjustParentValueAccordingToTheStrategy(currentConfig.getParents()));
+				int parents = currentConfig.getParents();
+				spnParents.setValue(parents);
+				if (currentConfig.getStrategy() == Strategy.Tournament)
+					parents = 1;
+				lblPopulationSize.setText("" + parents);
 				spnInversion.setValue(currentConfig.getDescendantsUsingInversion());
 				spnSwap.setValue(currentConfig.getDescendantsUsingSwap());
+				lblSwap.setText("" + currentConfig.getDescendantsUsingSwap() * parents);
+				lblInversion.setText("" + currentConfig.getDescendantsUsingInversion() * parents);
 				rdbPlusLambda.setSelected(currentConfig.isStrategiePlus());
 				rdbCommaLambda.setSelected(!currentConfig.isStrategiePlus());
 				rdbNormal.setSelected(currentConfig.getStrategy() == Strategy.Normal);
@@ -649,12 +654,12 @@ public class ToolsPanel extends JPanel {
 		gbc_lblParents_1.gridy = 0;
 		panel_2.add(lblParents_1, gbc_lblParents_1);
 
-		lblParents = new JLabel("0");
-		GridBagConstraints gbc_lblNumOfParents = new GridBagConstraints();
-		gbc_lblNumOfParents.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNumOfParents.gridx = 2;
-		gbc_lblNumOfParents.gridy = 0;
-		panel_2.add(lblParents, gbc_lblNumOfParents);
+		lblPopulationSize = new JLabel("0");
+		GridBagConstraints gbc_lblPopulationSize = new GridBagConstraints();
+		gbc_lblPopulationSize.insets = new Insets(0, 0, 5, 5);
+		gbc_lblPopulationSize.gridx = 2;
+		gbc_lblPopulationSize.gridy = 0;
+		panel_2.add(lblPopulationSize, gbc_lblPopulationSize);
 
 		lblDescendents = new JLabel("parents");
 		GridBagConstraints gbc_lblDescendents = new GridBagConstraints();
