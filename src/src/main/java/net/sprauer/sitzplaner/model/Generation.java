@@ -107,10 +107,11 @@ public class Generation {
 			do {
 				Chromosome chromosome = population.get(index);
 				double delta = Math.abs(fitness - chromosome.getFitness());
-				if (delta > 0.5)
+				if (delta > 0.5) {
 					parents.add(chromosome);
+					fitness = chromosome.getFitness();
+				}
 				index++;
-				fitness = chromosome.getFitness();
 			} while (parents.size() < Math.min(population.size(), configuration.getParents()) && index < population.size());
 		}
 
