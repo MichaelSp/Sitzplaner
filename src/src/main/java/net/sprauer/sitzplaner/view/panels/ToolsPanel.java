@@ -93,7 +93,7 @@ public class ToolsPanel extends JPanel {
 	private JLabel lblParents;
 	private JLabel lblDescendants;
 	private JLabel lblDescendents;
-	private JLabel lblDescendants1;
+	private JLabel lblDescendantsTotal;
 	private JLabel lblTotal;
 	private JLabel lblSwap;
 	private JLabel lblInversion;
@@ -228,15 +228,6 @@ public class ToolsPanel extends JPanel {
 	private void updateMutationDistribution() {
 		final int swap = (Integer) spnSwap.getValue();
 		final int inversion = (Integer) spnInversion.getValue();
-		final int numParents = (Integer) spnParents.getValue();
-		int numDescendants = (inversion + swap);
-		if (!rdbTournament.isSelected()) {
-			numDescendants = numDescendants * numParents;
-		}
-		lblDescendants.setText("" + numDescendants);
-		lblDescendants1.setText("" + numDescendants);
-		lblSwap.setText("" + (swap * numParents));
-		lblInversion.setText("" + (inversion * numParents));
 		if (blockUpdates) {
 			return;
 		}
@@ -260,8 +251,8 @@ public class ToolsPanel extends JPanel {
 				if (blockUpdates) {
 					return;
 				}
-				final Integer value = (Integer) spnParents.getValue();
-				lblParents.setText("" + value);
+				int value = (Integer) spnParents.getValue();
+				lblParents.setText("" + adjustParentValueAccordingToTheStrategy(value));
 				updateMutationDistribution();
 				ConfigManager.instance().getCurrentConfig().setParents(value);
 			}
@@ -288,7 +279,7 @@ public class ToolsPanel extends JPanel {
 				spnRight2.setValue(currentConfig.getWeightingRight2());
 				spnPriority.setValue(currentConfig.getWeightingPriority());
 				spnParents.setValue(currentConfig.getParents());
-				lblParents.setText("" + currentConfig.getParents());
+				lblParents.setText("" + adjustParentValueAccordingToTheStrategy(currentConfig.getParents()));
 				spnInversion.setValue(currentConfig.getDescendantsUsingInversion());
 				spnSwap.setValue(currentConfig.getDescendantsUsingSwap());
 				rdbPlusLambda.setSelected(currentConfig.isStrategiePlus());
@@ -298,7 +289,7 @@ public class ToolsPanel extends JPanel {
 				rdbTournament.setSelected(currentConfig.getStrategy() == Strategy.Tournament);
 				spnTournamentSize.setValue(currentConfig.getTournamentSize());
 				lblDescendants.setText("" + currentConfig.getNumberOfDescendents());
-				lblDescendants1.setText("" + currentConfig.getNumberOfDescendents());
+				lblDescendantsTotal.setText("" + currentConfig.getNumberOfDescendents());
 				spnNumberOfInversions.setValue(currentConfig.getNumberOfInversions());
 				spnNumberOfSwaps.setValue(currentConfig.getNumberOfSwaps());
 				spnTournamentSize.setEnabled(rdbTournament.isSelected());
@@ -306,6 +297,14 @@ public class ToolsPanel extends JPanel {
 				blockUpdates = false;
 			}
 		});
+	}
+
+	protected int adjustParentValueAccordingToTheStrategy(int value) {
+		if (rdbPlusLambda.isSelected())
+			value += ConfigManager.instance().getCurrentConfig().getNumberOfDescendents();
+		if (rdbTournament.isSelected())
+			value = 1;
+		return value;
 	}
 
 	public ToolsPanel() {
@@ -834,12 +833,12 @@ public class ToolsPanel extends JPanel {
 		gbc_lblTheNewGeneration.gridy = 5;
 		panel_2.add(lblTheNewGeneration, gbc_lblTheNewGeneration);
 
-		lblDescendants1 = new JLabel("10");
-		GridBagConstraints gbc_lblDescendants1 = new GridBagConstraints();
-		gbc_lblDescendants1.insets = new Insets(0, 0, 0, 5);
-		gbc_lblDescendants1.gridx = 4;
-		gbc_lblDescendants1.gridy = 5;
-		panel_2.add(lblDescendants1, gbc_lblDescendants1);
+		lblDescendantsTotal = new JLabel("10");
+		GridBagConstraints gbc_lblDescendantsTotal = new GridBagConstraints();
+		gbc_lblDescendantsTotal.insets = new Insets(0, 0, 0, 5);
+		gbc_lblDescendantsTotal.gridx = 4;
+		gbc_lblDescendantsTotal.gridy = 5;
+		panel_2.add(lblDescendantsTotal, gbc_lblDescendantsTotal);
 
 		panel_1 = new JPanel();
 		tabSettings.addTab("Weighting", null, panel_1, null);
