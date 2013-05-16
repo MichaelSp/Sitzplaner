@@ -31,7 +31,7 @@ public class Generation {
 		bestSolution = null;
 		worstSolution = null;
 	}
-	
+
 	public Configuration getConfiguration() {
 		return configuration;
 	}
@@ -56,8 +56,8 @@ public class Generation {
 		}
 	}
 
-	public synchronized  void evolve() {
-		Collections.sort(population);
+	public synchronized void evolve() {
+		sortPopulation();
 		List<Chromosome> parents = selecteTheBestAndKillTheRest();
 
 		List<Chromosome> children = new ArrayList<Chromosome>();
@@ -102,8 +102,16 @@ public class Generation {
 		if (configuration.getStrategy() == Strategy.Tournament) {
 			tournamentSelection(parents);
 		} else {
-			int selectionSize = Math.min(population.size(), configuration.getParents());
-			parents = population.subList(0, selectionSize);
+			int index = 0;
+			double fitness = Double.MAX_VALUE;
+			do {
+				Chromosome chromosome = population.get(index);
+				double delta = Math.abs(fitness - chromosome.getFitness());
+				if (delta > 0.5)
+					parents.add(chromosome);
+				index++;
+				fitness = chromosome.getFitness();
+			} while (parents.size() < Math.min(population.size(), configuration.getParents()) && index < population.size());
 		}
 
 		clear();
