@@ -43,7 +43,8 @@ public class EAFactory {
 					return;
 				}
 				generation.evolve();
-				StatisticsPanel.instance().addFitness(conf, generation.getBestSolution().getFitness(), generation.getWorstSolution().getFitness());
+				StatisticsPanel.instance().addFitness(conf, generation.getBestSolution().getFitness(),
+						generation.getWorstSolution().getFitness());
 				ToolsPanel.instance().stepProgress();
 			}
 		});
@@ -113,5 +114,9 @@ public class EAFactory {
 		ToolsPanel.instance().setCalculationActive(false);
 		exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		stopRequested = false;
+	}
+
+	public static int getNumberOfGenerations() {
+		return numOfGenerations;
 	}
 }

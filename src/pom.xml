@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.sprauer.sitzplaner</groupId>
 	<artifactId>net.sprauer.sitzplaner</artifactId>
-	<version>0.3.5.0</version>
+	<version>0.3.6.0</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -80,7 +80,7 @@
 						</goals>
 						<configuration>
 							<headerType>gui</headerType>
-							<outfile>Sitzplaner-${project.version}.exe</outfile>
+							<outfile>../Sitzplaner-${project.version}.exe</outfile>
 							<jar>target/${project.artifactId}-${project.version}-jar-with-dependencies.jar</jar>
 							<errTitle>Application Error</errTitle>
 							<classPath>

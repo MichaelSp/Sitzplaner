@@ -260,10 +260,12 @@ public class ToolsPanel extends JPanel {
 
 		ConfigManager.instance().addListDataListener(new ListDataListener() {
 			@Override
-			public void intervalRemoved(ListDataEvent arg0) {}
+			public void intervalRemoved(ListDataEvent arg0) {
+			}
 
 			@Override
-			public void intervalAdded(ListDataEvent arg0) {}
+			public void intervalAdded(ListDataEvent arg0) {
+			}
 
 			@Override
 			public void contentsChanged(ListDataEvent arg0) {
@@ -280,8 +282,9 @@ public class ToolsPanel extends JPanel {
 				spnPriority.setValue(currentConfig.getWeightingPriority());
 				int parents = currentConfig.getParents();
 				spnParents.setValue(parents);
-				if (currentConfig.getStrategy() == Strategy.Tournament)
+				if (currentConfig.getStrategy() == Strategy.Tournament) {
 					parents = 1;
+				}
 				lblPopulationSize.setText("" + parents);
 				spnInversion.setValue(currentConfig.getDescendantsUsingInversion());
 				spnSwap.setValue(currentConfig.getDescendantsUsingSwap());
@@ -305,10 +308,12 @@ public class ToolsPanel extends JPanel {
 	}
 
 	protected int adjustParentValueAccordingToTheStrategy(int value) {
-		if (rdbPlusLambda.isSelected())
+		if (rdbPlusLambda.isSelected()) {
 			value += ConfigManager.instance().getCurrentConfig().getNumberOfDescendents();
-		if (rdbTournament.isSelected())
+		}
+		if (rdbTournament.isSelected()) {
 			value = 1;
+		}
 		return value;
 	}
 
@@ -378,7 +383,8 @@ public class ToolsPanel extends JPanel {
 		gbc_classSize.gridx = 3;
 		gbc_classSize.gridy = 0;
 		pnlClassRoomSize.add(classSize, gbc_classSize);
-		classSize.setModel(new SpinnerNumberModel(new Short((short) 1), new Short((short) 1), new Short((short) 1), new Short((short) 1)));
+		classSize.setModel(new SpinnerNumberModel(new Short((short) 1), new Short((short) 1), new Short((short) 1), new Short(
+				(short) 1)));
 		classSize.setValue(new Short((short) (Parameter.numCols * Parameter.numRows)));
 		classSize.getModel().addChangeListener(new ChangeListener() {
 
@@ -488,7 +494,8 @@ public class ToolsPanel extends JPanel {
 		btnSettingsSave = new JButton(Factory.CommandSaveSettings);
 		btnSettingsSave.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent arg0) {}
+			public void actionPerformed(ActionEvent arg0) {
+			}
 		});
 		GridBagConstraints gbc_btnSave = new GridBagConstraints();
 		gbc_btnSave.fill = GridBagConstraints.HORIZONTAL;
@@ -542,7 +549,8 @@ public class ToolsPanel extends JPanel {
 		panel.add(rdbCommaLambda, gbc_rdbCommaLambda);
 
 		panel_4 = new JPanel();
-		panel_4.setBorder(new TitledBorder(null, "Additional Selection Methods", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_4.setBorder(new TitledBorder(null, "Additional Selection Methods", TitledBorder.LEADING, TitledBorder.TOP, null,
+				null));
 		GridBagConstraints gbc_panel_4 = new GridBagConstraints();
 		gbc_panel_4.insets = new Insets(0, 0, 5, 0);
 		gbc_panel_4.gridheight = 4;
@@ -1134,6 +1142,10 @@ public class ToolsPanel extends JPanel {
 	public void resetProgress() {
 		progressBar.setVisible(false);
 		progressBar.setValue(0);
+	}
+
+	public void setNumberOfGenerations(int numberOfGenerations) {
+		spnNumberOfGenerations.setValue(numberOfGenerations);
 	}
 
 }

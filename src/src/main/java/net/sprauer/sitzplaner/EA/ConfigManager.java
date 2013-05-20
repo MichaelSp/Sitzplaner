@@ -96,6 +96,7 @@ public class ConfigManager extends AbstractListModel implements Iterable<Configu
 
 	public void saveConfigTo(ObjectOutputStream oos) throws IOException {
 		oos.writeObject(parameters);
+		oos.writeInt(EAFactory.getNumberOfGenerations());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -108,6 +109,13 @@ public class ConfigManager extends AbstractListModel implements Iterable<Configu
 		currentIndex = 0;
 		ToolsPanel.instance().setButtonDeleteConfigEnabled(parameters.size() > 1);
 		fireContentsChanged(this, 0, parameters.size());
+		try {
+			int numberOfGenerations = ois.readInt();
+			EAFactory.setNumberOfGenerations(numberOfGenerations);
+			ToolsPanel.instance().setNumberOfGenerations(numberOfGenerations);
+		} catch (Exception e) {
+			// never mind. That's just an old version.
+		}
 		return true;
 	}
 
